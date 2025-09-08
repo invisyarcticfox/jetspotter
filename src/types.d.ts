@@ -7,9 +7,9 @@ export type FlightInfo = {
   dbFlags: number
   desc?: string
   ownOp?: string
-  alt_baro: number | 'ground'
+  alt_baro: number
   alt_geom?: number
-  track?: number
+  mach: number
   squawk?: string
   emergency?: string
   category?: string
@@ -25,30 +25,16 @@ export type adsbOneRes = {
 export type PlaneSpotterRes = {
   photos: Array<{
     id: string
-    thumbnail: {
-      src: string
-      size: { width: number, height: number }
-    }
-    thumbnail_large: {
-      src: string
-      size: { width: number, height: number }
-    }
+    thumbnail: { src: string, size: { width: number, height: number } }
+    thumbnail_large: { src: string, size: { width: number, height: number } }
     link: string
     photographer: string
   }>
 }
-export interface PlaneInfo { thumbnail: string, link: string }
+export type PlaneInfo = { thumbnail: string, link: string }
 
-export type DiscordWebhook = {
-  content: string
-  embeds: Array<{
-    color: number
-    fields: Array<{
-      name: string
-      value: string
-      inline: boolean
-    }>
-    image: { url: string } | undefined
-  }>
-  attachments: Array<any>
+export type AltitudeGradient = {
+  offset: number
+  altitude: number
+  color: { h:number, s:number, l:number }
 }

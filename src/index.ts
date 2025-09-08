@@ -1,8 +1,7 @@
 import 'dotenv/config'
-
-import { baseUrl, coord, radius, int, isBlacklisted, whUrl } from './config'
+import { baseUrl, coord, radius, int, isBlacklisted } from './config'
 import type { adsbOneRes } from './types'
-import { getPlaneInfo } from './services/planeInfo'
+import { getPlanespotterInfo } from './services/planespotterInfo'
 import { sendWebhook } from './services/webhook'
 
 let activeMilitary = new Set<string>()
@@ -33,13 +32,14 @@ async function getMilitary() {
           console.log(`${now} Military aircraft detected!`)
           console.log(`   Operator: ${flight.ownOp || 'N/A'}`)
           console.log(`   Type: ${flight.desc || 'N/A'}`)
+          console.log(`   Callsign: ${flight.flight || 'N/A'}`)
           console.log(`   Reg: ${flight.r || 'N/A'}`)
-          console.log(`   Hex: ${flight.hex || 'N/A'}`)
           console.log(`   Alt: ${flight.alt_baro}ft`)
           console.log(`   Lat: ${flight.lat}`)
           console.log(`   Lon: ${flight.lon}`)
+          console.log(`   Speed: ${(flight.mach * 661.47) || 'N/A'}kts`)
 
-          const imgUrl = flight.r ? await getPlaneInfo(flight.r) : null
+          const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
           await sendWebhook(flight, imgUrl)
           console.log(` ===============`)
         }
