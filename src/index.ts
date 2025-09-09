@@ -37,7 +37,7 @@ async function getMilitary() {
           console.log(`   Alt: ${flight.alt_baro}ft`)
           console.log(`   Lat: ${flight.lat}`)
           console.log(`   Lon: ${flight.lon}`)
-          console.log(`   Speed: ${Math.round(flight.mach * 661.47) || 'N/A'}kts`)
+          console.log(`   Speed: ${flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'}`)
 
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
           await sendWebhook(flight, imgUrl)

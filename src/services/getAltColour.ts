@@ -18,7 +18,7 @@ const gradient:AltitudeGradient[] = [
 
 export function hslToDec(h:number, s:number, l:number):number {
   const [ r, g, b ] = convert.hsl.rgb(h, s, l)
-  return ( r >> 16 ) + ( g << 8 ) + b
+  return ( r << 16 ) + ( g << 8 ) + b
 }
 
 export function getAltitudeColour(altitude:number):number {

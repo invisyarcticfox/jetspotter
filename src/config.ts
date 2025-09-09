@@ -6,7 +6,7 @@ export const coord = {
   lon: process.env.COORD_LON
 }
 export const radius = 20
-export const int = 10000
+export const int = 20000
 
 export const whUrl = process.env.DISCORD_WEBHOOK_URL
 
