@@ -1,6 +1,6 @@
 {
-  "name": "jetspotter-custom",
-  "version": "1.0.1",
+  "name": "jetspotter",
+  "version": "1.0.2",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",

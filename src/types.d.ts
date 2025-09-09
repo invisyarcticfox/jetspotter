@@ -8,13 +8,10 @@ export type FlightInfo = {
   desc?: string
   ownOp?: string
   alt_baro: number
-  alt_geom?: number
-  mach: number
-  squawk?: string
-  emergency?: string
-  category?: string
-  lat: number
-  lon: number
+  baro_rate?: number
+  mach?: number
+  lat?: number
+  lon?: number
 }
 export type adsbOneRes = {
   ac: FlightInfo[]
