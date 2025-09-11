@@ -1,8 +1,8 @@
 import 'dotenv/config'
-import { baseUrl, coord, radius, int, isBlacklisted } from './config'
+import { baseUrl, coord, radius, secs, isBlacklisted } from './config'
 import type { adsbOneRes } from './types'
 import { getPlanespotterInfo } from './services/planespotterInfo'
-import { sendWebhook } from './services/webhook'
+import { sendDiscordWebhook, sendPushoverNotif } from './services/webhooks'
 
 let activeMilitary = new Set<string>()
 
@@ -40,7 +40,8 @@ async function getMilitary() {
           console.log(`   Speed: ${flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'}`)
 
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
-          await sendWebhook(flight, imgUrl)
+          await sendDiscordWebhook(flight, imgUrl)
+          await sendPushoverNotif(flight, imgUrl)
           console.log(` ===============`)
         }
       }
@@ -51,6 +52,6 @@ async function getMilitary() {
 
 
 console.log('script started. watching for military aircraft.')
-setInterval(getMilitary, int)
+setInterval(getMilitary, secs)
 
 getMilitary()
