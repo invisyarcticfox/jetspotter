@@ -3,6 +3,7 @@ import type { FlightInfo, PlaneInfo } from '../types'
 import { whUrl, poUserKey, poApiKey } from '../config'
 import { getAltitudeColour } from './getAltColour'
 import { WebhookClient } from 'discord.js'
+import pkg from '../../package.json'
 
 const webhookClient = new WebhookClient({ url: whUrl })
 
@@ -37,7 +38,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | 
             { name: 'Operator', value: flight.ownOp || 'N/A', inline: false },
           ],
           image: imgData?.thumbnail? { url: imgData.thumbnail } : undefined,
-          footer: { text: 'Version 1.0.3' }
+          footer: { text: `Version ${pkg.version}` }
         }
       ]
     })

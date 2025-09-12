@@ -25,7 +25,7 @@ async function getMilitary() {
     const currentMilitary = new Set<string>()
 
     for (const flight of flights) {
-      if (flight.dbFlags && !isBlacklisted(flight)) {
+      if (flight.dbFlags === 1 && !isBlacklisted(flight)) {
         currentMilitary.add(flight.hex)
 
         if (!activeMilitary.has(flight.hex)) {
