@@ -9,7 +9,7 @@ const webhookClient = new WebhookClient({ url: whUrl })
 
 
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | null) {
-  const csLink = `[${flight.flight || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
+  const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
   const regLink = imgData?.link ? `[${flight.r}](${imgData.link})` : flight.r || 'N/A'
   const altVal = (() => {
     let altStr = `${flight.alt_baro}ft`
