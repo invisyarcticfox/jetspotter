@@ -30,9 +30,9 @@ async function getMilitary() {
           console.log(`   Callsign: ${flight.flight || 'N/A'}`)
           console.log(`   Reg: ${flight.r || 'N/A'}`)
           console.log(`   Alt: ${flight.alt_baro || 'N/A'}ft`)
-          console.log(`   LatLon: ${flight.lat}, ${flight.lon}`)
+          console.log(`   Lat Lon: ${flight.lat || 'N/A'}, ${flight.lon || 'N/A'}`)
           console.log(`   Track: ${flight.track || 'N/A'}`)
-          console.log(`   Speed: ${flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'}`)
+          console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
 
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
           await sendDiscordWebhook(flight, imgUrl)
@@ -46,7 +46,7 @@ async function getMilitary() {
 }
 
 
-console.log('script started. watching for military aircraft.')
+console.log('Script started. Watching for military aircraft.')
 setInterval(getMilitary, secs)
 
 getMilitary()

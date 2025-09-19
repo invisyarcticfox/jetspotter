@@ -1,5 +1,5 @@
-import type { FlightInfo, AltitudeGradient } from './types'
 import convert from 'color-convert'
+import type { FlightInfo, AltitudeGradient } from './types'
 
 
 export function formatAltitude(flight:FlightInfo):string {

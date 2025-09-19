@@ -11,7 +11,6 @@ const webhookClient = new WebhookClient({ url: whUrl })
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | null) {
   const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
   const regLink = imgData?.link ? `[${flight.r}](${imgData.link})` : flight.r || 'N/A'
-  const ktsSpeed = flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'
 
   try {
     await webhookClient.send({
@@ -23,10 +22,10 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | 
             { name: 'Callsign', value: csLink, inline: true },
             { name: 'Registration', value: regLink, inline: true },
             { name: 'Altitude', value: formatAltitude(flight), inline: true },
-            { name: 'Speed', value: ktsSpeed, inline: true },
-            { name: 'LatLon', value: `${flight.lat || 'N/A'}, ${flight.lat || 'N/A'}`, inline: true },
+            { name: 'Speed', value: `${flight.gs || 'N/A'}kts`, inline: true },
+            { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lat.toFixed(2)}`, inline: true },
             { name: 'Track', value: formatTrackDirection(flight), inline: true },
-            { name: 'Type', value: flight.desc || 'N/A', inline: false },
+            { name: 'Type', value: flight.desc?.replace(/\s*\(.*\)$/, '') || 'N/A', inline: false },
             { name: 'Operator', value: flight.ownOp || 'N/A', inline: false },
           ],
           image: imgData?.thumbnail ? { url: imgData.thumbnail } : undefined,
