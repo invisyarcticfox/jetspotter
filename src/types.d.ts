@@ -8,6 +8,7 @@ export type FlightInfo = {
   desc?: string
   ownOp?: string
   alt_baro: number
+  track?: number
   baro_rate?: number
   mach?: number
   lat?: number

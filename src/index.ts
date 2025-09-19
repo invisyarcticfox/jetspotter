@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import { baseUrl, coord, radius, secs, isBlacklisted } from './config'
 import type { adsbOneRes } from './types'
-import { getPlanespotterInfo } from './services/planespotterInfo'
-import { sendDiscordWebhook, sendPushoverNotif } from './services/webhooks'
+import { getPlanespotterInfo } from './services/planespotter'
+import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
 
 let activeMilitary = new Set<string>()
 
@@ -10,17 +10,12 @@ let activeMilitary = new Set<string>()
 async function getMilitary() {
   const now = `[${new Date().toLocaleString()}] -`
 
-  console.log(`${now} No aircraft found.`)
-
   try {
     const res = await fetch(`${baseUrl}/${coord.lat}/${coord.lon}/${radius}`)
     const d:adsbOneRes = await res.json()
     const { ac: flights } = d
 
-    if ( !flights || flights.length === 0 ) {
-      console.log(`${now} No aircraft found.`)
-      return
-    }
+    if ( !flights || flights.length === 0 ) { return }
 
     const currentMilitary = new Set<string>()
 
@@ -34,15 +29,15 @@ async function getMilitary() {
           console.log(`   Type: ${flight.desc || 'N/A'}`)
           console.log(`   Callsign: ${flight.flight || 'N/A'}`)
           console.log(`   Reg: ${flight.r || 'N/A'}`)
-          console.log(`   Alt: ${flight.alt_baro}ft`)
-          console.log(`   Lat: ${flight.lat}`)
-          console.log(`   Lon: ${flight.lon}`)
+          console.log(`   Alt: ${flight.alt_baro || 'N/A'}ft`)
+          console.log(`   LatLon: ${flight.lat}, ${flight.lon}`)
+          console.log(`   Track: ${flight.track || 'N/A'}`)
           console.log(`   Speed: ${flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'}`)
 
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
           await sendDiscordWebhook(flight, imgUrl)
           await sendPushoverNotif(flight, imgUrl)
-          console.log(` ===============`)
+          console.log(`===============`)
         }
       }
     }

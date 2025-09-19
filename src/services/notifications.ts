@@ -1,8 +1,8 @@
 import 'dotenv/config'
 import type { FlightInfo, PlaneInfo } from '../types'
 import { whUrl, poUserKey, poApiKey } from '../config'
-import { getAltitudeColour } from './getAltColour'
 import { WebhookClient } from 'discord.js'
+import { formatAltitude, formatTrackDirection, getAltitudeColour } from '../utils'
 import pkg from '../../package.json'
 
 const webhookClient = new WebhookClient({ url: whUrl })
@@ -11,14 +11,6 @@ const webhookClient = new WebhookClient({ url: whUrl })
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | null) {
   const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
   const regLink = imgData?.link ? `[${flight.r}](${imgData.link})` : flight.r || 'N/A'
-  const altVal = (() => {
-    let altStr = `${flight.alt_baro}ft`
-    if (flight.baro_rate != null) {
-      if (flight.baro_rate! > 0) { altStr += ' ↑'
-      } else if (flight.baro_rate! < 0) { altStr += ' ↓' }
-    }
-    return altStr
-  })()
   const ktsSpeed = flight.mach ? `~${Math.round(flight.mach * 661.47)}kts` : 'N/A'
 
   try {
@@ -30,14 +22,14 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | 
           fields: [
             { name: 'Callsign', value: csLink, inline: true },
             { name: 'Registration', value: regLink, inline: true },
-            { name: 'Altitude', value: altVal, inline: true },
+            { name: 'Altitude', value: formatAltitude(flight), inline: true },
             { name: 'Speed', value: ktsSpeed, inline: true },
-            { name: 'Lat', value: `${flight.lat || 'N/A'}`, inline: true },
-            { name: 'Lon', value: `${flight.lon || 'N/A'}`, inline: true },
+            { name: 'LatLon', value: `${flight.lat || 'N/A'}, ${flight.lat || 'N/A'}`, inline: true },
+            { name: 'Track', value: formatTrackDirection(flight), inline: true },
             { name: 'Type', value: flight.desc || 'N/A', inline: false },
             { name: 'Operator', value: flight.ownOp || 'N/A', inline: false },
           ],
-          image: imgData?.thumbnail? { url: imgData.thumbnail } : undefined,
+          image: imgData?.thumbnail ? { url: imgData.thumbnail } : undefined,
           footer: { text: `Version ${pkg.version}` }
         }
       ]

@@ -1,5 +1,36 @@
+import type { FlightInfo, AltitudeGradient } from './types'
 import convert from 'color-convert'
-import type { AltitudeGradient } from '../types'
+
+
+export function formatAltitude(flight:FlightInfo):string {
+  let altStr = `${flight.alt_baro}ft`
+  if (flight.baro_rate != null) {
+    if (flight.baro_rate > 0) {
+      altStr += ' ↑'
+    } else if (flight.baro_rate < 0) {
+      altStr += ' ↓'
+    }
+  }
+  return altStr
+}
+
+export function formatTrackDirection(flight:FlightInfo):string {
+  if (!flight.track) { return 'N/A' }
+
+  const deg = flight.track
+
+  let arrow = null
+  if (deg >= 337.5 || deg < 22.5) arrow = '↑'
+  else if (deg >= 22.5 && deg < 67.5) arrow = '↗'
+  else if (deg >= 67.5 && deg < 112.5) arrow = '→'
+  else if (deg >= 112.5 && deg < 157.5) arrow = '↘'
+  else if (deg >= 157.5 && deg < 202.5) arrow = '↓'
+  else if (deg >= 202.5 && deg < 247.5) arrow = '↙'
+  else if (deg >= 247.5 && deg < 292.5) arrow = '←'
+  else if (deg >= 292.5 && deg < 337.5) arrow = '↖'
+
+  return `${deg}° ${arrow}`
+}
 
 
 const gradient:AltitudeGradient[] = [
