@@ -23,7 +23,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | 
             { name: 'Registration', value: regLink, inline: true },
             { name: 'Altitude', value: formatAltitude(flight), inline: true },
             { name: 'Speed', value: `${flight.gs || 'N/A'}kts`, inline: true },
-            { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lat.toFixed(2)}`, inline: true },
+            { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lon.toFixed(2)}`, inline: true },
             { name: 'Track', value: formatTrackDirection(flight), inline: true },
             { name: 'Type', value: flight.desc?.replace(/\s*\(.*\)$/, '') || 'N/A', inline: false },
             { name: 'Operator', value: flight.ownOp || 'N/A', inline: false },
