@@ -1,8 +1,10 @@
 import 'dotenv/config'
 import { baseUrl, coord, radius, secs, isBlacklisted } from './config'
-import type { adsbOneRes } from './types'
+import type { FlightData } from './types'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
+import { sendToR2 } from './services/cloudflare'
+import { updateSeen } from './utils'
 
 let activeMilitary = new Set<string>()
 
@@ -12,7 +14,7 @@ async function getMilitary() {
 
   try {
     const res = await fetch(`${baseUrl}/${coord.lat}/${coord.lon}/${radius}`)
-    const d:adsbOneRes = await res.json()
+    const d:FlightData = await res.json()
     const { ac: flights } = d
 
     if ( !flights || flights.length === 0 ) { return }
@@ -37,6 +39,8 @@ async function getMilitary() {
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
           await sendDiscordWebhook(flight, imgUrl)
           await sendPushoverNotif(flight, imgUrl)
+          updateSeen(flight.r || 'N/A', flight.desc || 'N/A', flight.ownOp || 'N/A')
+          await sendToR2()
           console.log(`===============`)
         }
       }

@@ -7,6 +7,9 @@ export const secs = 20 * 1000
 export const whUrl = process.env.DISCORD_WEBHOOK_URL as string
 export const poUserKey = process.env.PUSHOVER_USER_KEY as string
 export const poApiKey = process.env.PUSHOVER_API_KEY as string
+export const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID as string
+export const cfAccessKey = process.env.CLOUDFLARE_ACCESS_KEY_ID as string
+export const cfSecretAccessKey = process.env.CLOUDFLARE_SECRET_ACCESS_KEY as string
 
 const blacklist = [ 'AIRBUS HELICOPTERS' ]
 export function isBlacklisted(flight:FlightInfo):boolean {

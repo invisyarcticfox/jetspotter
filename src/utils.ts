@@ -1,5 +1,7 @@
+import fs from 'fs'
+import path from 'path'
 import convert from 'color-convert'
-import type { FlightInfo, AltitudeGradient } from './types'
+import type { FlightInfo, AltitudeGradient, SeenData } from './types'
 
 
 export function formatAltitude(flight:FlightInfo):string {
@@ -85,4 +87,38 @@ export function getAltitudeColour(altitude:number):number {
   const interpL = lowerStop!.color.l + ( upperStop.color.l - lowerStop!.color.l ) * ratio
 
   return hslToDec( interpH, interpS, interpL )
+}
+
+
+const seenFile = path.join(process.cwd(), 'data', 'seen.json')
+
+export function loadSeen():SeenData {
+  if (!fs.existsSync(seenFile)) {
+    fs.mkdirSync(path.dirname(seenFile), { recursive: true })
+    fs.writeFileSync(seenFile, '{}')
+  }
+
+  try {
+    const raw = fs.readFileSync(seenFile, 'utf-8')
+    return JSON.parse(raw)
+  } catch (error) {
+    console.error(error)
+    return {}
+  }
+}
+
+export function updateSeen(reg:string, type:string, operator:string) {
+  if (!reg || reg === 'N/A') { return }
+
+  const data = loadSeen()
+  const now = new Date().toISOString()
+
+  if (!data[reg]) {
+    data[reg] = { type, operator, seenCount: 1, lastSeen: now }
+  } else {
+    data[reg].seenCount += 1
+    data[reg].lastSeen = now
+  }
+
+  fs.writeFileSync(seenFile, JSON.stringify(data, null, 2))
 }

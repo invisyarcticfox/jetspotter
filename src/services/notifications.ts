@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import type { FlightInfo, PlaneInfo } from '../types'
 import { whUrl, poUserKey, poApiKey } from '../config'
 import { WebhookClient } from 'discord.js'

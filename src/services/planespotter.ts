@@ -1,10 +1,10 @@
-import type { PlaneSpotterRes, PlaneInfo } from '../types'
+import type { PlaneSpotter, PlaneInfo } from '../types'
 
 
 export async function getPlanespotterInfo(reg:string): Promise<PlaneInfo | null> {
   try {
     const res = await fetch(`https://api.planespotters.net/pub/photos/reg/${reg}`)
-    const d:PlaneSpotterRes = await res.json()
+    const d:PlaneSpotter = await res.json()
     if (!res.ok) return null
 
     if (d.photos && d.photos.length > 0) {

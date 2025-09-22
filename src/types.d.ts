@@ -17,13 +17,9 @@ export type FlightInfo = {
   lat: number
   lon: number
 }
-export type adsbOneRes = {
-  ac: FlightInfo[]
-  msg: string
-  now: number
-}
+export type FlightData = { ac: FlightInfo[], msg: string, now: number }
 
-export type PlaneSpotterRes = {
+export type PlaneSpotter = {
   photos: Array<{
     id: string
     thumbnail: { src: string, size: { width: number, height: number } }
@@ -39,3 +35,5 @@ export type AltitudeGradient = {
   altitude: number
   color: { h:number, s:number, l:number }
 }
+
+export type SeenData = Record<string, { type: string, operator: string, seenCount: number, lastSeen: string }>
