@@ -16,3 +16,9 @@ export function isBlacklisted(flight:FlightInfo):boolean {
   if (!flight.desc) return false
   return blacklist.some(phrase => flight.desc?.includes(phrase))
 }
+
+const whitelist = [ 'Beluga XL' ]
+export function isWhitelisted(flight:FlightInfo):boolean {
+  if (!flight.desc) return false
+  return whitelist.some(phrase => flight.desc?.includes(phrase))
+}

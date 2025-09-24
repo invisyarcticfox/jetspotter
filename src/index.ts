@@ -1,5 +1,5 @@
 import 'dotenv/config'
-import { baseUrl, coord, radius, secs, isBlacklisted } from './config'
+import { baseUrl, coord, radius, secs, isBlacklisted, isWhitelisted } from './config'
 import type { FlightData } from './types'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
@@ -22,7 +22,7 @@ async function getMilitary() {
     const currentMilitary = new Set<string>()
 
     for (const flight of flights) {
-      if (flight.dbFlags === 1 && !isBlacklisted(flight)) {
+      if (flight.dbFlags === 1 || isWhitelisted(flight) && !isBlacklisted(flight)) {
         currentMilitary.add(flight.hex)
 
         if (!activeMilitary.has(flight.hex)) {
