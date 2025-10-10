@@ -4,7 +4,7 @@ import { WebhookClient } from 'discord.js'
 import { formatAltitude, formatTrackDirection, getAltitudeColour } from '../utils'
 import pkg from '../../package.json'
 
-const webhookClient = new WebhookClient({ url: whUrl })
+const webhookClient = new WebhookClient({ url: whUrl as string })
 
 
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlaneInfo | null) {
@@ -40,8 +40,8 @@ export async function sendPushoverNotif(flight:FlightInfo, imgData:PlaneInfo | n
   try {
     const formData = new FormData()
 
-    formData.append('token', poApiKey)
-    formData.append('user', poUserKey)
+    formData.append('token', poApiKey as string)
+    formData.append('user', poUserKey as string)
     formData.append('title', 'Military Aircraft Spotted')
     formData.append('message', `a ${flight.desc} at ${flight.alt_baro}ft!`)
     formData.append('url', `https://globe.adsbexchange.com/?icao=${flight.hex}`)

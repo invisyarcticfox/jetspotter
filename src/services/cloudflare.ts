@@ -6,7 +6,7 @@ import { cfAccountId, cfAccessKey, cfSecretAccessKey } from '../config'
 const s3 = new S3Client({
   region: 'auto',
   endpoint: `https://${cfAccountId}.r2.cloudflarestorage.com`,
-  credentials: { accessKeyId: cfAccessKey, secretAccessKey: cfSecretAccessKey }
+  credentials: { accessKeyId: cfAccessKey as string, secretAccessKey: cfSecretAccessKey as string }
 })
 
 const bucket = 'api'
