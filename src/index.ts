@@ -4,7 +4,6 @@ import type { FlightData } from './types'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
 import { sendToR2 } from './services/cloudflare'
-import { updateSeen } from './utils'
 
 let activeFlights = new Set<string>()
 
@@ -37,11 +36,10 @@ async function getMilitary() {
           console.log(`   Track: ${flight.track || 'N/A'}`)
           console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
 
-          const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
+          const imgUrl = await getPlanespotterInfo(flight)
           await sendDiscordWebhook(flight, imgUrl, category)
           await sendPushoverNotif(flight, imgUrl, category)
-          updateSeen(flight.r || 'N/A', flight.desc || 'N/A', flight.ownOp || 'N/A')
-          await sendToR2()
+          await sendToR2(flight.r || 'N/A', flight.desc || 'N/A', flight.ownOp || 'N/A')
           console.log(`===============`)
         }
       }

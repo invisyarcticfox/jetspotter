@@ -1,6 +1,7 @@
 import fs from 'fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { cfAccountId, cfAccessKey, cfSecretAccessKey, seenFile } from '../config'
+import { updateSeen } from '../utils'
 
 const s3 = new S3Client({
   region: 'auto',
@@ -11,7 +12,9 @@ const s3 = new S3Client({
 const bucket = 'api'
 
 
-export async function sendToR2() {
+export async function sendToR2(reg:string, type:string, operator:string) {
+  updateSeen(reg,type,operator)
+  
   try {
     const file = fs.readFileSync(seenFile)
 
