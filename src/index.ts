@@ -6,7 +6,7 @@ import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
 import { sendToR2 } from './services/cloudflare'
 import { updateSeen } from './utils'
 
-let activeMilitary = new Set<string>()
+let activeFlights = new Set<string>()
 
 
 async function getMilitary() {
@@ -19,14 +19,15 @@ async function getMilitary() {
 
     if ( !flights || flights.length === 0 ) { return }
 
-    const currentMilitary = new Set<string>()
+    const currentFlights = new Set<string>()
 
     for (const flight of flights) {
       if ((flight.dbFlags === 1 || isWhitelisted(flight)) && !isBlacklisted(flight)) {
-        currentMilitary.add(flight.hex)
+        const category = flight.dbFlags === 1 ? 'Military' : 'Whitelisted'
+        currentFlights.add(flight.hex)
 
-        if (!activeMilitary.has(flight.hex)) {
-          console.log(`${now} Military aircraft detected!`)
+        if (!activeFlights.has(flight.hex)) {
+          console.log(`${now} ${category} aircraft detected!`)
           console.log(`   Operator: ${flight.ownOp || 'N/A'}`)
           console.log(`   Type: ${flight.desc || 'N/A'}`)
           console.log(`   Callsign: ${flight.flight || 'N/A'}`)
@@ -37,20 +38,19 @@ async function getMilitary() {
           console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
 
           const imgUrl = flight.r ? await getPlanespotterInfo(flight.r) : null
-          await sendDiscordWebhook(flight, imgUrl)
-          await sendPushoverNotif(flight, imgUrl)
+          await sendDiscordWebhook(flight, imgUrl, category)
+          await sendPushoverNotif(flight, imgUrl, category)
           updateSeen(flight.r || 'N/A', flight.desc || 'N/A', flight.ownOp || 'N/A')
           await sendToR2()
           console.log(`===============`)
         }
       }
     }
-    activeMilitary = currentMilitary
+    activeFlights = currentFlights
   } catch (error) { console.error(error) }
 }
 
 
-console.log('Script started. Watching for military aircraft.')
+console.log('Script started. Watching for matching aircraft.')
 setInterval(getMilitary, secs)
-
 getMilitary()

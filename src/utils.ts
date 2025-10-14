@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import convert from 'color-convert'
 import type { FlightInfo, AltitudeGradient, SeenData } from './types'
+import { seenFile } from './config'
 
 
 export function formatAltitude(flight:FlightInfo):string {
@@ -89,8 +90,6 @@ export function getAltitudeColour(altitude:number):number {
   return hslToDec( interpH, interpS, interpL )
 }
 
-
-const seenFile = path.join(process.cwd(), 'data', 'seen.json')
 
 export function loadSeen():SeenData {
   if (!fs.existsSync(seenFile)) {

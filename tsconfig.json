@@ -9,8 +9,5 @@
     "resolveJsonModule": true
   },
   "include": ["src"],
-  "exclude": [
-    "node_modules",
-    "temp"
-  ]
+  "exclude": [ "node_modules" ]
 }

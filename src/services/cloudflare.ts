@@ -1,7 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { cfAccountId, cfAccessKey, cfSecretAccessKey } from '../config'
+import { cfAccountId, cfAccessKey, cfSecretAccessKey, seenFile } from '../config'
 
 const s3 = new S3Client({
   region: 'auto',
@@ -10,7 +9,6 @@ const s3 = new S3Client({
 })
 
 const bucket = 'api'
-const seenFile = path.join(process.cwd(), 'data', 'seen.json')
 
 
 export async function sendToR2() {

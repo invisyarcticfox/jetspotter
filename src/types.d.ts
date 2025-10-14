@@ -20,15 +20,18 @@ export type FlightInfo = {
 export type FlightData = { ac: FlightInfo[], msg: string, now: number }
 
 export type PlaneSpotter = {
-  photos: Array<{
+  photos: {
     id: string
     thumbnail: { src: string, size: { width: number, height: number } }
     thumbnail_large: { src: string, size: { width: number, height: number } }
     link: string
     photographer: string
-  }>
+  }[]
 }
-export type PlaneInfo = { thumbnail: string, link: string }
+export type PlanePhoto = {
+  thumbnail: { small: string, large: string }
+  link: string
+}
 
 export type AltitudeGradient = {
   offset: number
