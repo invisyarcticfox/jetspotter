@@ -107,7 +107,7 @@ export function loadSeen():SeenData {
 }
 
 export function updateSeen(reg:string, type:string, operator:string) {
-  if (!reg || reg === 'N/A') { return }
+  if (reg === 'N/A') { return }
 
   const data = loadSeen()
   const now = new Date().toISOString()
@@ -120,4 +120,20 @@ export function updateSeen(reg:string, type:string, operator:string) {
   }
 
   fs.writeFileSync(seenFile, JSON.stringify(data, null, 2))
+}
+
+export function getSeen(reg:string) {
+  if (reg === 'N/A') return
+
+  try {
+    const data = loadSeen()
+    const count = data[reg].seenCount || 0
+
+    if (count === 0) return
+    const times = count === 1 ? 'time' : 'times'
+    return `${count} ${times}`
+  } catch (error) {
+    console.error(error)
+    return
+  }
 }

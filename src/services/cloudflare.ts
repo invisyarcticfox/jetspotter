@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { FlightInfo } from '../types'
 import { cfAccountId, cfAccessKey, cfSecretAccessKey, seenFile } from '../config'
 import { updateSeen } from '../utils'
 
@@ -12,7 +13,10 @@ const s3 = new S3Client({
 const bucket = 'api'
 
 
-export async function sendToR2(reg:string, type:string, operator:string) {
+export async function sendToR2(flight:FlightInfo) {
+  const reg = flight.r || 'N/A'
+  const type = flight.desc || 'N/A'
+  const operator = flight.ownOp || 'N/A'
   updateSeen(reg,type,operator)
   
   try {
