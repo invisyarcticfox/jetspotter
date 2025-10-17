@@ -38,5 +38,3 @@ export type AltitudeGradient = {
   altitude: number
   color: { h:number, s:number, l:number }
 }
-
-export type SeenData = Record<string, { type: string, operator: string, seenCount: number, lastSeen: string }>

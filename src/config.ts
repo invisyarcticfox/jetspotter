@@ -1,4 +1,3 @@
-import path from 'path'
 import type { FlightInfo } from './types'
 
 
@@ -12,9 +11,6 @@ export const poApiKey = process.env.PUSHOVER_API_KEY
 export const cfAccountId = process.env.CLOUDFLARE_ACCOUNT_ID
 export const cfAccessKey = process.env.CLOUDFLARE_ACCESS_KEY_ID
 export const cfSecretAccessKey = process.env.CLOUDFLARE_SECRET_ACCESS_KEY
-
-export const seenFile = path.join(process.cwd(), 'data', 'seen.json')
-
 
 const blacklist = [ 'AIRBUS HELICOPTERS' ]
 export function isBlacklisted(flight:FlightInfo):boolean {

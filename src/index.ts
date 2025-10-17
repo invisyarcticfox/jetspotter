@@ -1,10 +1,10 @@
 import 'dotenv/config'
 import { baseUrl, coord, radius, secs, isBlacklisted, isWhitelisted } from './config'
 import type { FlightData } from './types'
+import { getSeen, recentlySeen } from './utils'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
 import { sendToR2 } from './services/cloudflare'
-import { getSeen } from './utils'
 
 let activeFlights = new Set<string>()
 
@@ -25,6 +25,8 @@ async function getMilitary() {
       if ((flight.dbFlags === 1 || isWhitelisted(flight)) && !isBlacklisted(flight)) {
         const category = flight.dbFlags === 1 ? 'Military' : 'Whitelisted'
         currentFlights.add(flight.hex)
+
+        if (recentlySeen(flight.r || 'N/A')) continue
 
         if (!activeFlights.has(flight.hex)) {
           console.log(`${now} ${category} aircraft detected!`)

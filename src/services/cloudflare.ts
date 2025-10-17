@@ -1,8 +1,8 @@
 import fs from 'fs'
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { FlightInfo } from '../types'
-import { cfAccountId, cfAccessKey, cfSecretAccessKey, seenFile } from '../config'
-import { updateSeen } from '../utils'
+import { cfAccountId, cfAccessKey, cfSecretAccessKey } from '../config'
+import { updateSeen, seenFile } from '../utils'
 
 const s3 = new S3Client({
   region: 'auto',
