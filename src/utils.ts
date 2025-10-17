@@ -127,7 +127,7 @@ export function getSeen(reg:string) {
 
   try {
     const data = loadSeen()
-    const count = data[reg].seenCount || 0
+    const count = data[reg]?.seenCount || 0
 
     if (count === 0) return
     const times = count === 1 ? 'time' : 'times'
