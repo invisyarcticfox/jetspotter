@@ -14,10 +14,9 @@ async function getMilitary() {
 
   try {
     const res = await fetch(`${baseUrl}/${coord.lat}/${coord.lon}/${radius}`)
-    const d:FlightData = await res.json()
-    const { ac: flights } = d
-
-    if ( !flights || flights.length === 0 ) { return }
+    if (!res.ok) console.error(res.status, res.statusText)
+    const { ac:flights }:FlightData = await res.json()
+    if (!flights || flights.length === 0) return
 
     const currentFlights = new Set<string>()
 
@@ -42,13 +41,16 @@ async function getMilitary() {
           if (seenTxt) console.log(`   ${seenTxt}`)
 
           const imgUrl = await getPlanespotterInfo(flight)
-          await sendDiscordWebhook(flight, imgUrl, category)
-          await sendPushoverNotif(flight, imgUrl, category)
-          await sendToR2(flight)
+          await Promise.allSettled([
+            await sendDiscordWebhook(flight, imgUrl, category),
+            await sendPushoverNotif(flight, imgUrl, category),
+            await sendToR2(flight)
+          ])
           console.log(`===============`)
         }
       }
     }
+
     activeFlights = currentFlights
   } catch (error) { console.error(error) }
 }

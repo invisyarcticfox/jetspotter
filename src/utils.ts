@@ -7,13 +7,12 @@ export const seenFile = path.join(process.cwd(), 'data', 'seen.json')
 
 
 export function formatAltitude(flight:FlightInfo):string {
+  if (!flight.alt_baro) return 'N/A'
+
   let altStr = `${flight.alt_baro}ft`
   if (flight.baro_rate != null) {
-    if (flight.baro_rate > 0) {
-      altStr += ' ↑'
-    } else if (flight.baro_rate < 0) {
-      altStr += ' ↓'
-    }
+    if (flight.baro_rate > 0) { altStr += ' ↑'
+    } else if (flight.baro_rate < 0) { altStr += ' ↓' }
   }
   return altStr
 }

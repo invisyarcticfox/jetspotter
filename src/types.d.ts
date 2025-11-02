@@ -17,7 +17,7 @@ export type FlightInfo = {
   lat: number
   lon: number
 }
-export type FlightData = { ac: FlightInfo[], msg: string, now: number }
+export type FlightData = { ac: FlightInfo[] | [], msg: string, now: number }
 
 export type PlaneSpotter = {
   photos: {

@@ -1,15 +1,15 @@
 import { WebhookClient } from 'discord.js'
 import type { FlightInfo, PlanePhoto } from '../types'
-import { whUrl, poUserKey, poApiKey } from '../config'
+import { dcWhUrl, poUserKey, poApiKey } from '../config'
 import { formatAltitude, formatTrackDirection, getAltitudeColour, getSeen } from '../utils'
 import pkg from '../../package.json'
 
-const webhookClient = new WebhookClient({ url: whUrl as string })
+const webhookClient = new WebhookClient({ url: dcWhUrl as string })
 
 
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto | null, category:string) {
   const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
-  const regLink = imgData ? `[${flight.r}](${imgData.link})` : flight.r || 'N/A'
+  const regLink = imgData ? `[${flight.r || 'N/A'}](${imgData.link})` : flight.r || 'N/A'
   const seenTxt = getSeen(flight.r || 'N/A')
 
   const fields: { name:string, value:string, inline?:boolean }[] = [
@@ -62,6 +62,7 @@ export async function sendPushoverNotif(flight:FlightInfo, imgData:PlanePhoto | 
       method: 'POST',
       body: formData
     })
+    if (!res.ok) console.error(res.status, res.statusText)
     const d = await res.json()
     
     if (d.status === 1) { console.log('   Sent Pushover Notification!')

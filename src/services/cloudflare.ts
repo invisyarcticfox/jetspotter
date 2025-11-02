@@ -10,8 +10,6 @@ const s3 = new S3Client({
   credentials: { accessKeyId: cfAccessKey as string, secretAccessKey: cfSecretAccessKey as string }
 })
 
-const bucket = 'api'
-
 
 export async function sendToR2(flight:FlightInfo) {
   const reg = flight.r || 'N/A'
@@ -20,13 +18,11 @@ export async function sendToR2(flight:FlightInfo) {
   updateSeen(reg,type,operator)
   
   try {
-    const file = fs.readFileSync(seenFile)
-
     await s3.send(
       new PutObjectCommand({
-        Bucket: bucket,
+        Bucket: 'api',
         Key: 'planes.json',
-        Body: file,
+        Body: fs.readFileSync(seenFile),
         ContentType: 'application/json'
       })
     )
