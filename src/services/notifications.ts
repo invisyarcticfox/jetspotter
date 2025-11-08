@@ -10,20 +10,20 @@ const webhookClient = new WebhookClient({ url: dcWhUrl as string })
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto | null, category:string) {
   const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
   const regLink = imgData ? `[${flight.r || 'N/A'}](${imgData.link})` : flight.r || 'N/A'
-  const seenTxt = getSeen(flight.r || 'N/A')
+  const seenTxt = getSeen(flight)
 
   const fields: { name:string, value:string, inline?:boolean }[] = [
     { name: 'Callsign', value: csLink, inline: true },
     { name: 'Registration', value: regLink, inline: true },
     { name: 'Altitude', value: formatAltitude(flight), inline: true },
-    { name: 'Speed', value: `${flight.gs || 'N/A'}kts`, inline: true },
+    { name: 'Speed', value: flight.gs ? `${flight.gs}kts` : 'N/A', inline: true },
     { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lon.toFixed(2)}`, inline: true },
     { name: 'Track', value: formatTrackDirection(flight), inline: true },
-    { name: 'Type', value: flight.desc?.replace(/\s*\(.*\)$/, '') || 'N/A', inline: false },
+    { name: 'Type', value: flight.desc || 'N/A', inline: false },
     { name: 'Operator', value: flight.ownOp || 'N/A', inline: true },
   ]
 
-  if (seenTxt) { fields.push({ name: 'Seen Before', value: seenTxt, inline: true}) }
+  if (seenTxt) fields.push({ name: 'Seen Before', value: seenTxt, inline: true })
 
   try {
     await webhookClient.send({

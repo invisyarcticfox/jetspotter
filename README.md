@@ -6,6 +6,6 @@
 This project depends on multiple different services, so if *for whatever reason* you want to use this too, here is a list of what I use:
 - [Discord Webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) for webhook notifications
 - [Pushover](https://pushover.net/) for mobile notifications
-- [Cloudflare R2](https://www.cloudflare.com/developer-platform/products/r2/) for data storage
+- [Betterstack](https://betterstack.com) for tracking uptime
 
-and if you don't want to use any of these, just **// comment out** the respective functions inside of the `index.ts` file.
+and if you don't want to use any of these, just **//comment out** the respective functions inside of the `index.ts` file.

@@ -21,6 +21,9 @@ export async function getPlanespotterInfo(flight:FlightInfo):Promise<PlanePhoto 
         link: photo.link
       }
     }
-  } catch (error) { console.error(error) }
+  } catch (error) {
+    console.error(error)
+    return null
+  }
   return null
 }

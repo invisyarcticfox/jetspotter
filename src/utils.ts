@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import convert from 'color-convert'
-import type { FlightInfo, AltitudeGradient } from './types'
+import type { FlightInfo, AltitudeGradient, SeenData } from './types'
 
 export const seenFile = path.join(process.cwd(), 'data', 'seen.json')
 
@@ -35,7 +35,6 @@ export function formatTrackDirection(flight:FlightInfo):string {
   return `${deg}° ${arrow}`
 }
 
-
 const gradient:AltitudeGradient[] = [
   { offset: 0, altitude: 0, color: { h: 23.125, s: 88, l: 51.04 } },
   { offset: 0.033, altitude: 500, color: { h: 23.125, s: 88, l: 51.04 } },
@@ -50,7 +49,7 @@ const gradient:AltitudeGradient[] = [
   { offset: 1, altitude: 40000, color: { h: 300, s: 88, l: 43 } },
 ]
 
-export function hslToDec(h:number, s:number, l:number):number {
+function hslToDec(h:number, s:number, l:number):number {
   const [ r, g, b ] = convert.hsl.rgb(h, s, l)
   return ( r << 16 ) + ( g << 8 ) + b
 }
@@ -91,7 +90,7 @@ export function getAltitudeColour(altitude:number):number {
 }
 
 
-export function loadSeen() {
+export function loadSeen():SeenData {
   if (!fs.existsSync(seenFile)) {
     fs.mkdirSync(path.dirname(seenFile), { recursive: true })
     fs.writeFileSync(seenFile, '{}')
@@ -106,28 +105,35 @@ export function loadSeen() {
   }
 }
 
-export function updateSeen(reg:string, type:string, operator:string) {
-  if (reg === 'N/A') { return }
+export function updateSeen({hex, r, flight, desc, ownOp}:FlightInfo) {
+  if (!hex) return
 
   const data = loadSeen()
   const now = new Date().toISOString()
 
-  if (!data[reg]) {
-    data[reg] = { type, operator, seenCount: 1, lastSeen: now }
+  if (!data[hex]) {
+    data[hex] = {
+      reg: r || 'N/A',
+      callsign: flight || 'N/A',
+      type: desc || 'N/A',
+      operator: ownOp || 'N/A',
+      seenCount: 1,
+      lastSeen: now
+    }
   } else {
-    data[reg].seenCount += 1
-    data[reg].lastSeen = now
+    data[hex].seenCount += 1
+    data[hex].lastSeen = now
   }
 
   fs.writeFileSync(seenFile, JSON.stringify(data, null, 2))
 }
 
-export function getSeen(reg:string) {
-  if (reg === 'N/A') return
+export function getSeen({hex}:FlightInfo):string|undefined {
+  if (!hex) return
 
   try {
     const data = loadSeen()
-    const count = data[reg]?.seenCount || 0
+    const count = data[hex]?.seenCount || 0
 
     if (count === 0) return
     const times = count === 1 ? 'time' : 'times'
@@ -138,12 +144,12 @@ export function getSeen(reg:string) {
   }
 }
 
-export function recentlySeen(reg:string, mins=5):boolean {
-  if (reg === 'N/A') return false
+export function recentlySeen({hex}:FlightInfo, mins=5):boolean {
+  if (!hex) return false
 
   try {
     const data = loadSeen()
-    const lastSeen = data[reg]?.lastSeen
+    const lastSeen = data[hex]?.lastSeen
     if (!lastSeen) return false
 
     const lastSeenTime = new Date(lastSeen).getTime()

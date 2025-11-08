@@ -38,3 +38,14 @@ export type AltitudeGradient = {
   altitude: number
   color: { h:number, s:number, l:number }
 }
+
+export type SeenData = {
+  [hex:string]: {
+    reg: string
+    callsign: string
+    type: string
+    operator: string
+    seenCount: number
+    lastSeen: string
+  }
+}

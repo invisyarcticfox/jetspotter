@@ -1,10 +1,10 @@
 import 'dotenv/config'
-import { baseUrl, coord, radius, secs, isBlacklisted, isWhitelisted } from './config'
+import { coord, radius, secs, isBlacklisted, isWhitelisted } from './config'
 import type { FlightData } from './types'
-import { getSeen, recentlySeen } from './utils'
+import { getSeen, recentlySeen, updateSeen } from './utils'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
-import { sendToR2 } from './services/cloudflare'
+import { betterstackHeartbeat } from './services/heartbeat'
 
 let activeFlights = new Set<string>()
 
@@ -13,7 +13,7 @@ async function getMilitary() {
   const now = `[${new Date().toLocaleString()}] -`
 
   try {
-    const res = await fetch(`${baseUrl}/${coord.lat}/${coord.lon}/${radius}`)
+    const res = await fetch(`https://api.airplanes.live/v2/point/${coord.lat}/${coord.lon}/${radius}`)
     if (!res.ok) console.error(res.status, res.statusText)
     const { ac:flights }:FlightData = await res.json()
     if (!flights || flights.length === 0) return
@@ -23,9 +23,9 @@ async function getMilitary() {
     for (const flight of flights) {
       if ((flight.dbFlags === 1 || isWhitelisted(flight)) && !isBlacklisted(flight)) {
         const category = flight.dbFlags === 1 ? 'Military' : 'Whitelisted'
-        currentFlights.add(flight.hex)
 
-        if (recentlySeen(flight.r || 'N/A')) continue
+        currentFlights.add(flight.hex)
+        if (recentlySeen(flight)) continue
 
         if (!activeFlights.has(flight.hex)) {
           console.log(`${now} ${category} aircraft detected!`)
@@ -34,28 +34,32 @@ async function getMilitary() {
           console.log(`   Callsign: ${flight.flight || 'N/A'}`)
           console.log(`   Reg: ${flight.r || 'N/A'}`)
           console.log(`   Alt: ${flight.alt_baro || 'N/A'}ft`)
-          console.log(`   Lat Lon: ${flight.lat || 'N/A'}, ${flight.lon || 'N/A'}`)
+          console.log(`   LatLon: ${flight.lat || 'N/A'}, ${flight.lon || 'N/A'}`)
           console.log(`   Track: ${flight.track || 'N/A'}`)
           console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
-          const seenTxt = getSeen(flight.r || 'N/A')
-          if (seenTxt) console.log(`   ${seenTxt}`)
+          const seenTxt = getSeen(flight)
+          if (seenTxt) console.log(`   Seen before ${seenTxt}`)
 
           const imgUrl = await getPlanespotterInfo(flight)
           await Promise.allSettled([
-            await sendDiscordWebhook(flight, imgUrl, category),
-            await sendPushoverNotif(flight, imgUrl, category),
-            await sendToR2(flight)
+            sendDiscordWebhook(flight, imgUrl, category),
+            sendPushoverNotif(flight, imgUrl, category),
           ])
+
+          updateSeen(flight)
           console.log(`===============`)
         }
       }
     }
 
     activeFlights = currentFlights
-  } catch (error) { console.error(error) }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 
 console.log('Script started. Watching for matching aircraft.')
 setInterval(getMilitary, secs)
+setInterval(betterstackHeartbeat, secs * 20)
 getMilitary()
