@@ -37,7 +37,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
         }
       ]
     })
-    console.log(`   Sent Discord Webhook message!`)
+    console.log('   Sent Discord Webhook message!')
   } catch (error) { console.error(error) }
 }
 

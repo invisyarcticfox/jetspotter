@@ -123,6 +123,7 @@ export function updateSeen({hex, r, flight, desc, ownOp}:FlightInfo) {
   } else {
     data[hex].seenCount += 1
     data[hex].lastSeen = now
+    if (flight) data[hex].callsign = flight
   }
 
   fs.writeFileSync(seenFile, JSON.stringify(data, null, 2))

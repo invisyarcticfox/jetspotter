@@ -14,7 +14,11 @@ async function getMilitary() {
 
   try {
     const res = await fetch(`https://api.airplanes.live/v2/point/${coord.lat}/${coord.lon}/${radius}`)
-    if (!res.ok) console.error(res.status, res.statusText)
+    if (!res.ok) {
+      await betterstackHeartbeat('fail')
+      console.error(res.status, res.statusText)
+      return
+    }
     const { ac:flights }:FlightData = await res.json()
     if (!flights || flights.length === 0) return
 
@@ -52,8 +56,10 @@ async function getMilitary() {
       }
     }
 
+    await betterstackHeartbeat('ok')
     activeFlights = currentFlights
   } catch (error) {
+    await betterstackHeartbeat('fail')
     console.error(error)
   }
 }
@@ -61,5 +67,4 @@ async function getMilitary() {
 
 console.log('Script started. Watching for matching aircraft.')
 setInterval(getMilitary, secs)
-setInterval(betterstackHeartbeat, secs * 20)
 getMilitary()
