@@ -16,7 +16,7 @@ async function getMilitary() {
     const res = await fetch(`https://api.airplanes.live/v2/point/${coord.lat}/${coord.lon}/${radius}`)
     if (!res.ok) {
       await betterstackHeartbeat('fail')
-      console.error(res.status, res.statusText)
+      console.error('Failed to fetch api.airplanes.live:', res.status, res.statusText)
       return
     }
     const { ac:flights }:FlightData = await res.json()
@@ -60,7 +60,7 @@ async function getMilitary() {
     activeFlights = currentFlights
   } catch (error) {
     await betterstackHeartbeat('fail')
-    console.error(error)
+    console.error('CRIT jetspotter error:', error)
   }
 }
 

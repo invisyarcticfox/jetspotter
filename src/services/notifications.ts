@@ -38,7 +38,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
       ]
     })
     console.log('   Sent Discord Webhook message!')
-  } catch (error) { console.error(error) }
+  } catch (error) { console.error('CRIT discord error:', error) }
 }
 
 export async function sendPushoverNotif(flight:FlightInfo, imgData:PlanePhoto | null, category:string) {
@@ -62,12 +62,12 @@ export async function sendPushoverNotif(flight:FlightInfo, imgData:PlanePhoto | 
       method: 'POST',
       body: formData
     })
-    if (!res.ok) console.error(res.status, res.statusText)
+    if (!res.ok) console.error('Failed to fetch Pushover:', res.status, res.statusText)
     const d = await res.json()
     
     if (d.status === 1) { console.log('   Sent Pushover Notification!')
     } else { console.log(d) }
   } catch (error) {
-    console.error(error)
+    console.error('CRIT pushover error:', error)
   }
 }

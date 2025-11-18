@@ -9,7 +9,7 @@ export async function getPlanespotterInfo(flight:FlightInfo):Promise<PlanePhoto 
 
     const res = await fetch(url)
     if (!res.ok) {
-      console.error(res.status, res.statusText)
+      console.error('Failed to fetch planespottes.net:', res.status, res.statusText)
       return null
     }
     const d:PlaneSpotter = await res.json()
@@ -22,7 +22,7 @@ export async function getPlanespotterInfo(flight:FlightInfo):Promise<PlanePhoto 
       }
     }
   } catch (error) {
-    console.error(error)
+    console.error('CRIT planespotter error:', error)
     return null
   }
   return null
