@@ -2,5 +2,6 @@ node_modules/
 .wrangler/
 dist/
 data/
+scripts/
 .env
 package-lock.json

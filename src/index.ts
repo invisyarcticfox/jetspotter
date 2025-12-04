@@ -4,7 +4,6 @@ import type { FlightData } from './types'
 import { getSeen, recentlySeen, updateSeen } from './utils'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
-import { betterstackHeartbeat } from './services/heartbeat'
 
 let activeFlights = new Set<string>()
 
@@ -15,7 +14,6 @@ async function getMilitary() {
   try {
     const res = await fetch(`https://api.airplanes.live/v2/point/${coord.lat}/${coord.lon}/${radius}`)
     if (!res.ok) {
-      await betterstackHeartbeat('fail')
       console.error('Failed to fetch api.airplanes.live:', res.status, res.statusText)
       return
     }
@@ -55,11 +53,9 @@ async function getMilitary() {
         }
       }
     }
-
-    await betterstackHeartbeat('ok')
+    
     activeFlights = currentFlights
   } catch (error) {
-    await betterstackHeartbeat('fail')
     console.error('CRIT jetspotter error:', error)
   }
 }

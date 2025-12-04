@@ -1,10 +1,7 @@
-import { WebhookClient } from 'discord.js'
 import type { FlightInfo, PlanePhoto } from '../types'
-import { dcWhUrl, poUserKey, poApiKey } from '../config'
+import { poUserKey, poApiKey } from '../config'
 import { formatAltitude, formatTrackDirection, getAltitudeColour, getSeen } from '../utils'
 import pkg from '../../package.json'
-
-const webhookClient = new WebhookClient({ url: dcWhUrl as string })
 
 
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto | null, category:string) {
@@ -12,7 +9,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
   const regLink = imgData ? `[${flight.r || 'N/A'}](${imgData.link})` : flight.r || 'N/A'
   const seenTxt = getSeen(flight)
 
-  const fields: { name:string, value:string, inline?:boolean }[] = [
+  const fields:{ name:string, value:string, inline?:boolean }[] = [
     { name: 'Callsign', value: csLink, inline: true },
     { name: 'Registration', value: regLink, inline: true },
     { name: 'Altitude', value: formatAltitude(flight), inline: true },
@@ -22,22 +19,25 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
     { name: 'Type', value: flight.desc || 'N/A', inline: false },
     { name: 'Operator', value: flight.ownOp || 'N/A', inline: true },
   ]
-
   if (seenTxt) fields.push({ name: 'Seen Before', value: seenTxt, inline: true })
 
+  const embed = {
+    color: getAltitudeColour(flight.alt_baro),
+    fields,
+    image: imgData ? { url: imgData.thumbnail.small } : undefined,
+    footer: { text: `Version ${pkg.version}` }
+  }
+  
+
   try {
-    await webhookClient.send({
-      content: `:airplane: ${category} Aircraft Spotted! :airplane:`,
-      embeds: [
-        {
-          color: getAltitudeColour(flight.alt_baro),
-          fields,
-          image: imgData ? { url: imgData.thumbnail.small } : undefined,
-          footer: { text: `Version ${pkg.version}` }
-        }
-      ]
+    const res = await fetch('http://raspi:3621/jetspotter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ category, embed })
     })
-    console.log('   Sent Discord Webhook message!')
+    
+    if (!res.ok) { console.error('Local POST Failed', await res.text())
+    } else { console.log('Local POST Success!') }
   } catch (error) { console.error('CRIT discord error:', error) }
 }
 

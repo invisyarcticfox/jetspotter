@@ -1,11 +1,11 @@
 {
   "name": "jetspotter",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "freshstart": "tsc && node dist/index.js"
+    "freshstart": "npm run build && npm run start",
+    "restart": "npm run build && sudo systemctl restart jetspotter"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
