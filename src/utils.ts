@@ -49,13 +49,12 @@ const gradient:AltitudeGradient[] = [
   { offset: 1, altitude: 40000, color: { h: 300, s: 88, l: 43 } },
 ]
 
-function hslToDec(h:number, s:number, l:number):number {
-  const [ r, g, b ] = convert.hsl.rgb(h, s, l)
-  return ( r << 16 ) + ( g << 8 ) + b
+function hslToHex(h:number, s:number, l:number):string {
+  return `#${convert.hsl.hex(h,s,l)}`
 }
 
-export function getAltitudeColour(altitude:number):number {
-  if (!altitude) { return 0x808080 }
+export function getAltitudeColour(altitude:number):string {
+  if (!altitude) { return '#808080' }
 
   let lowerStop:AltitudeGradient | null = null
   let upperStop:AltitudeGradient | null = null
@@ -75,7 +74,7 @@ export function getAltitudeColour(altitude:number):number {
   }
 
   if (lowerStop === upperStop || altitude <= lowerStop!.altitude) {
-    return hslToDec( lowerStop!.color.h, lowerStop!.color.s, lowerStop!.color.l )
+    return hslToHex( lowerStop!.color.h, lowerStop!.color.s, lowerStop!.color.l )
   }
 
   const rangeAlt = upperStop.altitude - lowerStop!.altitude
@@ -86,7 +85,7 @@ export function getAltitudeColour(altitude:number):number {
   const interpS = lowerStop!.color.s + ( upperStop.color.s - lowerStop!.color.s ) * ratio
   const interpL = lowerStop!.color.l + ( upperStop.color.l - lowerStop!.color.l ) * ratio
 
-  return hslToDec( interpH, interpS, interpL )
+  return hslToHex( interpH, interpS, interpL )
 }
 
 
@@ -105,7 +104,7 @@ export function loadSeen():SeenData {
   }
 }
 
-export function updateSeen({hex, r, flight, desc, ownOp}:FlightInfo) {
+export function updateSeen({hex, r, flight, desc, ownOp, dbFlags}:FlightInfo) {
   if (!hex) return
 
   const data = loadSeen()
@@ -117,6 +116,7 @@ export function updateSeen({hex, r, flight, desc, ownOp}:FlightInfo) {
       callsign: flight || 'N/A',
       type: desc || 'N/A',
       operator: ownOp || 'N/A',
+      military: dbFlags === 1,
       seenCount: 1,
       lastSeen: now
     }

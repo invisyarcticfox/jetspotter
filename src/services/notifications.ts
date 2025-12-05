@@ -5,13 +5,11 @@ import pkg from '../../package.json'
 
 
 export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto | null, category:string) {
-  const csLink = `[${flight.flight?.trim() || 'N/A'}](https://globe.adsbexchange.com/?icao=${flight.hex})`
-  const regLink = imgData ? `[${flight.r || 'N/A'}](${imgData.link})` : flight.r || 'N/A'
   const seenTxt = getSeen(flight)
 
   const fields:{ name:string, value:string, inline?:boolean }[] = [
-    { name: 'Callsign', value: csLink, inline: true },
-    { name: 'Registration', value: regLink, inline: true },
+    { name: 'Callsign', value: `${flight.flight?.trim() || 'N/A'}`, inline: true },
+    { name: 'Registration', value: `${flight.r || 'N/A'}`, inline: true },
     { name: 'Altitude', value: formatAltitude(flight), inline: true },
     { name: 'Speed', value: flight.gs ? `${flight.gs}kts` : 'N/A', inline: true },
     { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lon.toFixed(2)}`, inline: true },
@@ -27,17 +25,21 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
     image: imgData ? { url: imgData.thumbnail.small } : undefined,
     footer: { text: `Version ${pkg.version}` }
   }
+  const buttons = {
+    adsbexchange: `https://globe.adsbexchange.com/?icao=${flight.hex}`,
+    planespotters: imgData ? imgData.link : undefined
+  }
   
 
   try {
     const res = await fetch('http://raspi:3621/jetspotter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ category, embed })
+      body: JSON.stringify({ category, embed, buttons })
     })
     
-    if (!res.ok) { console.error('Local POST Failed', await res.text())
-    } else { console.log('Local POST Success!') }
+    if (!res.ok) { console.error('   Local POST Failed', await res.text())
+    } else { console.log('   Local POST Success!') }
   } catch (error) { console.error('CRIT discord error:', error) }
 }
 
@@ -58,10 +60,7 @@ export async function sendPushoverNotif(flight:FlightInfo, imgData:PlanePhoto | 
       formData.append('attachment', blob, `${flight.r}.jpg`)
     }
 
-    const res = await fetch('https://api.pushover.net/1/messages.json', {
-      method: 'POST',
-      body: formData
-    })
+    const res = await fetch('https://api.pushover.net/1/messages.json', { method: 'POST', body: formData })
     if (!res.ok) console.error('Failed to fetch Pushover:', res.status, res.statusText)
     const d = await res.json()
     

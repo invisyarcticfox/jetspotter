@@ -45,6 +45,7 @@ export type SeenData = {
     callsign: string
     type: string
     operator: string
+    military: boolean
     seenCount: number
     lastSeen: string
   }
