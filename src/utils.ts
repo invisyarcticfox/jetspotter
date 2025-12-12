@@ -104,7 +104,7 @@ export function loadSeen():SeenData {
   }
 }
 
-export function updateSeen({hex, r, flight, desc, ownOp, dbFlags}:FlightInfo) {
+export function updateSeen({hex, r, flight, desc, ownOp}:FlightInfo, country?:string|null) {
   if (!hex) return
 
   const data = loadSeen()
@@ -112,11 +112,11 @@ export function updateSeen({hex, r, flight, desc, ownOp, dbFlags}:FlightInfo) {
 
   if (!data[hex]) {
     data[hex] = {
-      reg: r || 'N/A',
-      callsign: flight || 'N/A',
+      reg: r?.trim() || 'N/A',
+      callsign: flight?.trim() || 'N/A',
       type: desc || 'N/A',
       operator: ownOp || 'N/A',
-      military: dbFlags === 1,
+      ...(country ? { country } : {}),
       seenCount: 1,
       lastSeen: now
     }

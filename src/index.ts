@@ -4,6 +4,7 @@ import type { FlightData } from './types'
 import { getSeen, recentlySeen, updateSeen } from './utils'
 import { getPlanespotterInfo } from './services/planespotter'
 import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
+import { getRegCountry } from './services/country'
 
 let activeFlights = new Set<string>()
 
@@ -41,6 +42,8 @@ async function getMilitary() {
           console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
           const seenTxt = getSeen(flight)
           if (seenTxt) console.log(`   Seen before ${seenTxt}`)
+          const country = await getRegCountry(flight)
+          if (country) console.log(`   Country: ${country}`)
 
           const imgUrl = await getPlanespotterInfo(flight)
           await Promise.allSettled([
@@ -48,7 +51,7 @@ async function getMilitary() {
             sendPushoverNotif(flight, imgUrl, category),
           ])
 
-          updateSeen(flight)
+          updateSeen(flight, country)
           console.log(`===============`)
         }
       }

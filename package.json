@@ -1,10 +1,10 @@
 {
   "name": "jetspotter",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "scripts": {
     "build": "tsc",
     "restart": "sudo systemctl restart jetspotter",
-    "restart:hard": "npm run build && npm run restart"
+    "restart:hard": "rm -rf ./dist && npm run build && npm run restart"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",

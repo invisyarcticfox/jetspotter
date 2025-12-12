@@ -9,7 +9,7 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
 
   const fields:{ name:string, value:string, inline?:boolean }[] = [
     { name: 'Callsign', value: `${flight.flight?.trim() || 'N/A'}`, inline: true },
-    { name: 'Registration', value: `${flight.r || 'N/A'}`, inline: true },
+    { name: 'Registration', value: `${flight.r?.trim() || 'N/A'}`, inline: true },
     { name: 'Altitude', value: formatAltitude(flight), inline: true },
     { name: 'Speed', value: flight.gs ? `${flight.gs}kts` : 'N/A', inline: true },
     { name: 'Lat Lon', value: `${flight.lat.toFixed(2)}, ${flight.lon.toFixed(2)}`, inline: true },
@@ -38,8 +38,8 @@ export async function sendDiscordWebhook(flight:FlightInfo, imgData:PlanePhoto |
       body: JSON.stringify({ category, embed, buttons })
     })
     
-    if (!res.ok) { console.error('   Local POST Failed', await res.text())
-    } else { console.log('   Local POST Success!') }
+    if (!res.ok) { console.error('Discord POST Failed', await res.text())
+    } else { console.log('   Discord POST Success!') }
   } catch (error) { console.error('CRIT discord error:', error) }
 }
 
