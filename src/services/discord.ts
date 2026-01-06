@@ -1,0 +1,47 @@
+import type { DiscordEmbed, DiscordEmbedField, DiscordButtons, PlaneContext } from '../types'
+import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount } from '../utils'
+import pkg from '../../package.json'
+
+
+export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenInfo}:PlaneContext) {
+  const seen = formatSeenCount(seenInfo)
+  const fields:DiscordEmbedField[] = [
+    { name: 'Operator', value: plane.ownOp ?? 'N/A', inline:true },
+    { name: 'Callsign', value: `${plane.flight?.trim() || 'N/A'}`, inline:true },
+    { name: 'Registration', value: `${plane.r?.trim() || 'N/A'}`, inline:true },
+    { name: 'Type', value: plane.desc ?? 'N/A', inline:true },
+    { name: 'Country', value: adsbdb?.country ?? 'N/A', inline:true },
+    { name: 'Speed', value: plane.gs ? `${plane.gs}kts` : 'N/A', inline:true },
+    { name: 'Lat Lon', value: plane.lat && plane.lon ? `${plane.lat.toFixed(2)} ${plane.lon.toFixed(2)}` : 'N/A', inline:true },
+    { name: 'Altitude', value: formatAltitude(plane), inline:true },
+    { name: 'Direction', value: formatTrackDir(plane), inline:true },
+  ]
+  if (seen) fields.push({ name: 'Seen Before', value: seen, inline:true })
+  fields.push({ name: 'Photographed?', value: seenInfo.photographed ? 'Yes' : 'No', inline:true })
+  
+  const embed:DiscordEmbed = {
+    color: getAltColour(plane.alt_baro),
+    fields,
+    image: thumb ? { url: thumb.thumbnail.large } : null,
+    footer: { text: thumb ? `Version ${pkg.version} - Photo by ${thumb.photographer}` : `Version ${pkg.version}` }
+  }
+  const buttons:DiscordButtons[] = [
+    { name: 'ADSBExchange.com', link: `https://globe.adsbexchange.com/?icao=${plane.hex}`, row: 1 },
+    { name: 'FlightRadar24.com', link: plane.flight?.trim() ? `https://flightradar24.com/${plane.flight.trim()}` : null, row: 1 },
+    { name: 'Planespotters.net', link: thumb ? thumb.link : null, row: 2 },
+  ]
+
+
+  try {
+    const res = await fetch('http://raspi:4321/api/discord/jetspotter', {
+      signal: timeout(),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': process.env.DISCORD_AUTH_KEY },
+      body: JSON.stringify({ category, embed, buttons })
+    })
+    if (!res.ok) { console.error('Discord POST failed:', res.status, res.statusText)
+    } else { logMsg('Sent Discord message.') }
+  } catch (error) {
+    console.error('Failed to send discord message:', error)
+  }
+}

@@ -1,7 +1,6 @@
-node_modules/
-.wrangler/
-dist/
-data/
-scripts/
+/data
+/dist
+/node_modules
+/scripts
 .env
 package-lock.json

@@ -1,69 +1,64 @@
 import 'dotenv/config'
-import { coord, radius, secs, isBlacklisted, isWhitelisted } from './config'
-import type { FlightData } from './types'
-import { getSeen, recentlySeen, updateSeen } from './utils'
-import { getPlanespotterInfo } from './services/planespotter'
-import { sendDiscordWebhook, sendPushoverNotif } from './services/notifications'
-import { getRegCountry } from './services/country'
+import { coords, radius, secs, isWhitelisted, isBlacklisted } from './config'
+import type { AirplanesDotLive, PlaneContext } from './types'
+import { logKV, updateSeen, recentlySeen, timeout, getSeenInfo } from './utils'
+import { getDB, getThumbnail, sendToDiscord, sendToPushover, sendToCdn } from './services'
+import { startExpress } from './express'
 
-let activeFlights = new Set<string>()
+let activePlanes = new Set<string>()
 
 
-async function getMilitary() {
-  const now = `[${new Date().toLocaleString()}] -`
+async function getPlanes() {
+  const now = `[${new Date().toISOString()}] -`
+  const currentPlanes = new Set<string>()
 
   try {
-    const res = await fetch(`https://api.airplanes.live/v2/point/${coord.lat}/${coord.lon}/${radius}`)
+    const res = await fetch(`https://api.airplanes.live/v2/point/${coords.lat}/${coords.lon}/${radius}`, { signal:timeout() })
     if (!res.ok) {
-      console.error('Failed to fetch api.airplanes.live:', res.status, res.statusText)
+      console.error('Failed to fetch api.airplanes.live', res.status, res.statusText)
       return
     }
-    const { ac:flights }:FlightData = await res.json()
-    if (!flights || flights.length === 0) return
+    const { ac:flights }:AirplanesDotLive = await res.json()
+    if (!flights.length) return
+    
 
-    const currentFlights = new Set<string>()
+    for (const plane of flights) {
+      if ((plane.dbFlags === 1 || isWhitelisted(plane)) && !isBlacklisted(plane)) {
+        const category = plane.dbFlags === 1 ? 'Military' : 'Whitelisted'
 
-    for (const flight of flights) {
-      if ((flight.dbFlags === 1 || isWhitelisted(flight)) && !isBlacklisted(flight)) {
-        const category = flight.dbFlags === 1 ? 'Military' : 'Whitelisted'
+        currentPlanes.add(plane.hex)
+        if (await recentlySeen(plane)) continue
 
-        currentFlights.add(flight.hex)
-        if (recentlySeen(flight)) continue
+        if (!activePlanes.has(plane.hex)) {
+          console.log(`${now} ${category} plane spotted.`)
+          const seenInfo = await getSeenInfo(plane)
+          const [ adsbdb, thumb ] = await Promise.all([ getDB(plane), getThumbnail(plane) ])
+          const ctx:PlaneContext = { plane, category, adsbdb, thumb, seenInfo }
 
-        if (!activeFlights.has(flight.hex)) {
-          console.log(`${now} ${category} aircraft detected!`)
-          console.log(`   Operator: ${flight.ownOp || 'N/A'}`)
-          console.log(`   Type: ${flight.desc || 'N/A'}`)
-          console.log(`   Callsign: ${flight.flight || 'N/A'}`)
-          console.log(`   Reg: ${flight.r || 'N/A'}`)
-          console.log(`   Alt: ${flight.alt_baro || 'N/A'}ft`)
-          console.log(`   LatLon: ${flight.lat || 'N/A'}, ${flight.lon || 'N/A'}`)
-          console.log(`   Track: ${flight.track || 'N/A'}`)
-          console.log(`   Speed: ${flight.gs || 'N/A'}kts`)
-          const seenTxt = getSeen(flight)
-          if (seenTxt) console.log(`   Seen before ${seenTxt}`)
-          const country = await getRegCountry(flight)
-          if (country) console.log(`   Country: ${country}`)
+          logKV('Operator', plane.ownOp ?? adsbdb?.operator)
+          logKV('Callsign', plane.flight)
+          logKV('Registration', plane.r)
+          logKV('Altitude', plane.alt_baro, 'ft')
+          // logKV('Lat Lon', `${plane.lat} ${plane.lon}`)
+          // logKV('Speed', plane.gs, 'kts')
+          logKV('Direction', plane.track, '°')
+          logKV('Type', plane.desc)
+          logKV('Country', adsbdb?.country)
+          // logKV('Seen before', seen)
 
-          const imgUrl = await getPlanespotterInfo(flight)
-          await Promise.allSettled([
-            sendDiscordWebhook(flight, imgUrl, category),
-            sendPushoverNotif(flight, imgUrl, category),
-          ])
-
-          updateSeen(flight, country)
-          console.log(`===============`)
+          await Promise.allSettled([ sendToDiscord(ctx), sendToPushover(ctx) ])
+          await updateSeen(ctx)
+          await sendToCdn()
+          console.log('===============')
         }
       }
     }
-    
-    activeFlights = currentFlights
-  } catch (error) {
-    console.error('CRIT jetspotter error:', error)
-  }
+  } catch (error) { console.error('jetspotter failed:', error)
+  } finally { activePlanes = currentPlanes }
 }
 
 
 console.log('Script started. Watching for matching aircraft.')
-setInterval(getMilitary, secs)
-getMilitary()
+setInterval(getPlanes, secs)
+getPlanes()
+startExpress()
