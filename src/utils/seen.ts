@@ -26,7 +26,7 @@ export async function updateSeen({plane, adsbdb, category}:PlaneContext) {
       reg: plane.r?.trim() || 'N/A',
       callsign: plane.flight?.trim() || 'N/A',
       type: plane.desc ?? 'N/A',
-      operator: plane.ownOp ?? 'N/A',
+      operator: plane.ownOp ?? adsbdb?.operator ?? 'N/A',
       country: adsbdb?.country ?? 'N/A',
       ...(isWhitelisted ? { category:'whitelisted' } : {} ),
       seenCount: 1,

@@ -3,32 +3,36 @@ import { logMsg, sleep, timeout } from '../utils'
 
 
 export async function getPlaneDB({hex, flight}:PlaneInfo):Promise<ADSBdbRes|null> {
-  const baseUrl = `https://api.adsbdb.com/v0/aircraft/${hex}`
-
+  let adsbdb = `https://api.adsbdb.com/v0/aircraft/${hex}`
+  let res
+  
   try {
-    let res = await fetch(baseUrl, { signal:timeout() })
+    res = await fetch(adsbdb, { signal:timeout() })
     if (res.ok) {
       const {response:{aircraft}}:ADSBdb = await res.json()
       return {
+        type: aircraft.type,
+        registration: aircraft.registration,
         country: aircraft.registered_owner_country_name,
         operator: aircraft.registered_owner
       }
-    } else { logMsg(`ADSBDB API returned ${res.status} for ${baseUrl}`, 'warn') }
+    } else { logMsg(`ADSBDB API returned ${res.status} for ${adsbdb}`, 'warn') }
 
     if (!flight?.trim()) return null
     await sleep(1000)
 
-    const url = new URL(baseUrl)
-    url.searchParams.set('callsign', flight)
-    res = await fetch(url, { signal:timeout() })
+    adsbdb += `?callsign=${flight.trim()}`
+    res = await fetch(adsbdb, { signal:timeout() })
     if (res.ok) {
       const {response:{aircraft}}:ADSBdb = await res.json()
       return {
+        type: aircraft.type,
+        registration: aircraft.registration,
         country: aircraft.registered_owner_country_name,
         operator: aircraft.registered_owner
       }
     } else {
-      logMsg(`ADSBDB API returned ${res.status} for ${url}`, 'warn')
+      logMsg(`ADSBDB API returned ${res.status} for ${adsbdb}`, 'warn')
       return null
     }
   } catch (error) {

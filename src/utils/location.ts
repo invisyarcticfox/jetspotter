@@ -50,7 +50,7 @@ const gradient:AltGradient[] = [
 
 function hslToHex({h,s,l}:{h:number,s:number,l:number}):string { return `#${convert.hsl.hex(h,s,l)}` }
 
-export function getAltColour(altitude:number|'ground'|undefined):string {
+export function getAltColour({alt_baro:altitude}:PlaneInfo):string {
   if (!altitude || altitude === 'ground') return '#808080'
 
   let lower = gradient[0]

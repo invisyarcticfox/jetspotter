@@ -6,7 +6,7 @@ import pkg from '../../package.json'
 export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenInfo}:PlaneContext) {
   const seen = formatSeenCount(seenInfo)
   const fields:DiscordEmbedField[] = [
-    { name: 'Operator', value: plane.ownOp ?? 'N/A', inline:true },
+    { name: 'Operator', value: plane.ownOp ?? adsbdb?.operator ?? 'N/A', inline:true },
     { name: 'Callsign', value: `${plane.flight?.trim() || 'N/A'}`, inline:true },
     { name: 'Registration', value: `${plane.r?.trim() || 'N/A'}`, inline:true },
     { name: 'Type', value: plane.desc ?? 'N/A', inline:true },
@@ -20,7 +20,7 @@ export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenIn
   fields.push({ name: 'Photographed?', value: seenInfo.photographed ? 'Yes' : 'No', inline:true })
   
   const embed:DiscordEmbed = {
-    color: getAltColour(plane.alt_baro),
+    color: getAltColour(plane),
     fields,
     image: thumb ? { url: thumb.thumbnail.large } : null,
     footer: { text: thumb ? `Version ${pkg.version} - Photo by ${thumb.photographer}` : `Version ${pkg.version}` }

@@ -93,12 +93,15 @@ export type ADSBdb = {
       registered_owner_country_name: string
       registered_owner_operator_flag_code: string
       registered_owner: string
-      url_photo: string|null
-      url_photo_thumbnail: string|null
     }
   }
 }
-export type ADSBdbRes = { country:string, operator:string }
+export type ADSBdbRes = {
+  type: string
+  registration: string
+  country: string
+  operator: string
+}
 
 export type DiscordEmbedField = { name:string, value:string, inline:boolean }
 export type DiscordEmbed = {
@@ -114,8 +117,8 @@ export type AltGradient = { altitude:number, color: { h:number, s:number, l:numb
 export type PlaneContext = {
   plane: PlaneInfo,
   category: 'Military'|'Whitelisted'
-  adsbdb?: ADSBdbRes | null
-  thumb?: PlaneSpottersPhoto | null
+  adsbdb?: ADSBdbRes|null
+  thumb?: PlaneSpottersPhoto|null
   seenInfo: PlaneSeenInfo
 }
 
@@ -134,7 +137,7 @@ export type SeenData = {
 }
 
 export type PlaneSeenInfo = {
-  seenCount: number | null
-  lastSeen: string | null
+  seenCount: number|null
+  lastSeen: string|null
   photographed: boolean
 }

@@ -41,10 +41,10 @@ async function getPlanes() {
           logKV('Altitude', plane.alt_baro, 'ft')
           // logKV('Lat Lon', `${plane.lat} ${plane.lon}`)
           // logKV('Speed', plane.gs, 'kts')
-          logKV('Direction', plane.track, '°')
+          // logKV('Direction', plane.track, '°')
           logKV('Type', plane.desc)
           logKV('Country', adsbdb?.country)
-          // logKV('Seen before', seen)
+          logKV('Seen before', seenInfo.seenCount)
 
           await Promise.allSettled([ sendToDiscord(ctx), sendToPushover(ctx) ])
           await updateSeen(ctx)

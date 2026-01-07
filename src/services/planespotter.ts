@@ -2,11 +2,11 @@ import type { PlaneSpotters, PlaneSpottersPhoto, PlaneInfo } from '../types'
 import { timeout } from '../utils'
 
 
-export async function getPlanespottersImage({hex,r,t}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
+export async function getPlanespottersImage({hex,r:reg,t:type}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
   try {
     const url = new URL(`https://api.planespotters.net/pub/photos/hex/${hex}`)
-    if (r) url.searchParams.set('reg', r)
-    if (t) url.searchParams.set('icaoType', t)
+    if (reg) url.searchParams.set('reg', reg)
+    if (type) url.searchParams.set('icaoType', type)
     
     const res = await fetch(url, { signal:timeout() })
     if (!res.ok) {
