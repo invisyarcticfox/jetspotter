@@ -6,7 +6,6 @@ import { logMsg } from '../utils'
 export async function sendPushoverNotif({plane, category, adsbdb, thumb}:PlaneContext) {
   try {
     const formData = new FormData()
-
     formData.append('token', env.pushover.token)
     formData.append('user', env.pushover.user)
     formData.append('title', `${category} Aircraft Spotted`)

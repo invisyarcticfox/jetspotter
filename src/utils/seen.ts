@@ -15,11 +15,10 @@ export async function loadSeen():Promise<SeenData> {
   }
 }
 
-export async function updateSeen({plane, adsbdb, category}:PlaneContext) {
+export async function updateSeen({plane, adsbdb, category, thumb}:PlaneContext) {
   const data = await loadSeen()
   const entry = plane.hex
   const now = new Date().toISOString()
-  const isWhitelisted = category === 'Whitelisted'
 
   if (!data[entry]) {
     data[entry] = {
@@ -28,14 +27,16 @@ export async function updateSeen({plane, adsbdb, category}:PlaneContext) {
       type: plane.desc ?? 'N/A',
       operator: plane.ownOp ?? adsbdb?.operator ?? 'N/A',
       country: adsbdb?.country ?? 'N/A',
-      ...(isWhitelisted ? { category:'whitelisted' } : {} ),
+      ...(category === 'Whitelisted' && { category:'whitelisted' } ),
       seenCount: 1,
-      lastSeen: now
+      lastSeen: now,
+      ...( thumb?.photographer && { photographer: thumb.photographer } )
     }
   } else {
     data[entry].seenCount += 1
     data[entry].lastSeen = now
-    if (plane.flight) data[entry].callsign = plane.flight.trim()
+    if (plane.flight?.trim()) data[entry].callsign = plane.flight.trim()
+    if (thumb) data[entry].photographer = thumb.photographer
   }
 
   try { await fs.writeFile(seenFile, JSON.stringify(data, null, 2), 'utf-8')

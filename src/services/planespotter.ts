@@ -2,7 +2,7 @@ import type { PlaneSpotters, PlaneSpottersPhoto, PlaneInfo } from '../types'
 import { timeout } from '../utils'
 
 
-export async function getPlanespottersImage({hex,r:reg,t:type}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
+export async function getPlanespottersImage({hex, r:reg, t:type}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
   try {
     const url = new URL(`https://api.planespotters.net/pub/photos/hex/${hex}`)
     if (reg) url.searchParams.set('reg', reg)
@@ -13,8 +13,8 @@ export async function getPlanespottersImage({hex,r:reg,t:type}:PlaneInfo):Promis
       console.error(`Failed to fetch planespotters.net`, res.status, res.statusText)
       return null
     }
-    const {photos}:PlaneSpotters = await res.json()
 
+    const {photos}:PlaneSpotters = await res.json()
     if (photos && photos.length > 0) {
       const photo = photos[0]
       return {

@@ -15,8 +15,7 @@ export const env = {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID,
     secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY
-  },
-  discord: { auth: process.env.DISCORD_AUTH_KEY }
+  }
 }
 
 

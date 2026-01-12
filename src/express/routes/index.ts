@@ -30,14 +30,9 @@ routes.get('/sort', async (req,res) => {
         let valA: number
         let valB: number
 
-        if (by === 'freq') {
-          valA = a.seenCount
-          valB = b.seenCount
-        } else {
-          valA = new Date(a.lastSeen).getTime()
-          valB = new Date(b.lastSeen).getTime()
-        }
-
+        if (by === 'freq') { valA = a.seenCount, valB = b.seenCount
+        } else { valA = new Date(a.lastSeen).getTime(), valB = new Date(b.lastSeen).getTime() }
+        
         return order === 'asc' ? valA - valB : valB - valA
       })
       .slice(0, Number(count))
@@ -52,8 +47,8 @@ routes.get('/sort', async (req,res) => {
 
 routes.post('/photo', async (req,res) => {
   try {
-    const input = req.body.trim().toUpperCase()
     const data = await loadSeen()
+    const input = req.body.trim().toUpperCase()
 
     let key = data[input] ? input : undefined
     if (!key) key = Object.keys(data).find(k => data[k].reg.toUpperCase() === input)

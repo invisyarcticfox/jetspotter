@@ -1,10 +1,9 @@
 import convert from 'color-convert'
-import type { PlaneInfo, AltGradient } from '../types'
+import type { PlaneInfo } from '../types'
 
 
 export function formatAltitude({alt_baro, baro_rate}:PlaneInfo):string {
   if (!alt_baro) return 'N/A'
-
   let altStr = `${alt_baro}ft`
   if (baro_rate == null) { return altStr
   } else if (baro_rate > 0) { altStr += ' ↑'
@@ -32,7 +31,7 @@ export function formatTrackDir({track}:PlaneInfo): string {
 }
 
 
-const gradient:AltGradient[] = [
+const gradient:{altitude:number, color: { h:number,s:number,l:number }}[] = [
   { altitude: 0,     color: { h:23.125, s:88, l:51.04 } },
   { altitude: 500,   color: { h:23.125, s:88, l:51.04 } },
   { altitude: 1000,  color: { h:26.25,  s:88, l:52.08 } },

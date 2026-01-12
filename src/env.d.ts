@@ -7,6 +7,5 @@ declare namespace NodeJS {
     CLOUDFLARE_ACCOUNT_ID: string
     CLOUDFLARE_ACCESS_KEY_ID: string
     CLOUDFLARE_SECRET_ACCESS_KEY: string
-    DISCORD_AUTH_KEY: string
   }
 }

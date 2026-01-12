@@ -44,7 +44,7 @@ async function getPlanes() {
           // logKV('Direction', plane.track, '°')
           logKV('Type', plane.desc)
           logKV('Country', adsbdb?.country)
-          logKV('Seen before', seenInfo.seenCount)
+          logKV('Seen before', `${seenInfo.seenCount} times`)
 
           await Promise.allSettled([ sendToDiscord(ctx), sendToPushover(ctx) ])
           await updateSeen(ctx)
