@@ -76,3 +76,14 @@ export function getAltColour({alt_baro:altitude}:PlaneInfo):string {
 
   return hslToHex(newHsl)
 }
+
+export function formatCoords(local:{lat:string,lon:string},plane:PlaneInfo):string {
+  if (!plane.lat && !plane.lon) return 'N/A'
+
+  const relLat = plane.lat - Number(local.lat)
+  const relLon = plane.lon - Number(local.lon)
+  let bearing = (Math.atan2(relLon, relLat) * 180) / Math.PI
+  if (bearing < 0) bearing += 360
+  const { arrow } = compass.find(({ max }) => bearing < max)!
+  return `${Number(local.lat).toFixed(2)}, ${Number(local.lon).toFixed(2)} ${arrow}`
+}

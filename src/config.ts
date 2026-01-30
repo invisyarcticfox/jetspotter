@@ -19,14 +19,15 @@ export const env = {
 }
 
 
-const blacklist = [ 'airbus helicopters' ]
+const blacklist = [ 'airbus helicopters', 'grob g-' ]
 export function isBlacklisted({desc}:PlaneInfo):boolean {
   if (!desc) return false
   return blacklist.some(d => desc.toLowerCase().includes(d))
 }
 
-const whitelist = [ 'beluga xl', 'antonov an-' ]
-export function isWhitelisted({desc}:PlaneInfo):boolean {
-  if (!desc) return false
-  return whitelist.some(d => desc.toLowerCase().includes(d))
+const whitelist = [ 'beluga xl', 'antonov an-', 'G-XXEE' ]
+export function isWhitelisted({desc, r}:PlaneInfo):boolean {
+  if (!desc && !r) return false
+  const check = [desc, r].filter(Boolean).map(f => f?.toLowerCase())
+  return whitelist.some(w => check.some(f => f?.includes(w)))
 }

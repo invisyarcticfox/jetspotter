@@ -1,23 +1,24 @@
 import type { DiscordEmbed, DiscordEmbedField, DiscordButtons, PlaneContext } from '../types'
-import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount } from '../utils'
+import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount, formatCoords } from '../utils'
+import { coords } from '../config'
 import pkg from '../../package.json'
 
 
 export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenInfo}:PlaneContext) {
   const seen = formatSeenCount(seenInfo)
   const fields:DiscordEmbedField[] = [
-    { name: 'Operator', value: plane.ownOp ?? adsbdb?.operator ?? 'N/A', inline:true },
+    { name: 'Operator', value: plane.ownOp ?? adsbdb?.operator ?? 'N/A' },
     { name: 'Callsign', value: `${plane.flight?.trim() || 'N/A'}` },
     { name: 'Registration', value: `${plane.r?.trim() || 'N/A'}` },
     { name: 'Type', value: plane.desc ?? 'N/A' },
     { name: 'Country', value: adsbdb?.country ?? 'N/A' },
     { name: 'Speed', value: plane.gs ? `${plane.gs}kts` : 'N/A' },
-    { name: 'Lat Lon', value: plane.lat && plane.lon ? `${plane.lat.toFixed(2)}, ${plane.lon.toFixed(2)}` : 'N/A' },
+    { name: 'Lat Lon', value: formatCoords(coords, plane) },
     { name: 'Altitude', value: formatAltitude(plane) },
-    { name: 'Direction', value: formatTrackDir(plane) },
+    { name: 'Bearing', value: formatTrackDir(plane) },
     { name: 'Seen Before?', value: seen ? seen : 'No' },
     { name: 'Photographed?', value: seenInfo.photographed ? 'Yes' : 'No' },
-  ].map(f => ({ ...f, inline: f.inline ?? true }) )
+  ].map(f => ({ ...f, inline:true }) )
   
   const embed:DiscordEmbed = {
     color: getAltColour(plane),
@@ -34,8 +35,7 @@ export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenIn
 
   try {
     const res = await fetch('http://raspi:4321/api/discord/jetspotter', {
-      signal: timeout(),
-      method: 'POST',
+      signal: timeout(), method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ category, embed, buttons })
     })
