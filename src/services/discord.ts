@@ -1,6 +1,6 @@
-import type { DiscordEmbed, DiscordEmbedField, DiscordButtons, PlaneContext } from '../types'
-import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount, formatCoords } from '../utils'
-import { coords } from '../config'
+import type { DiscordEmbed, DiscordEmbedField, DiscordButtons, PlaneContext } from '~/types'
+import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount, formatCoords } from '~/utils'
+import { coords } from '~/config'
 import pkg from '../../package.json'
 
 

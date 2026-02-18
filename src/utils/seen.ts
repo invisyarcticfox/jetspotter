@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
-import type { SeenData, PlaneContext, PlaneInfo, PlaneSeenInfo } from '../types'
-import { seenFile } from '../config'
+import type { SeenData, PlaneContext, PlaneInfo, PlaneSeenInfo } from '~/types'
+import { seenFile } from '~/config'
 
 
 export async function loadSeen():Promise<SeenData> {
@@ -45,12 +45,17 @@ export async function updateSeen({plane, adsbdb, category, thumb}:PlaneContext) 
 
 export function formatSeenCount({seenCount, lastSeen}:PlaneSeenInfo):string|null {
   if (!seenCount) return null
+
   const times = seenCount === 1 ? 'time': 'times'
-  const last = lastSeen ? `(${new Date(lastSeen).toLocaleDateString('en-GB')})` : ''
+  let last = ''
+  if (lastSeen) {
+    const unix = Math.floor(new Date(lastSeen).getTime() / 1000)
+    last = `(<t:${unix}:R>)`
+  }
   return `${seenCount} ${times} ${last}`
 }
 
-export async function recentlySeen({hex}:PlaneInfo, mins:number=10):Promise<boolean> {
+export async function recentlySeen({hex}:PlaneInfo, mins:number=30):Promise<boolean> {
   if (!hex) return false
 
   try {

@@ -1,5 +1,5 @@
 import convert from 'color-convert'
-import type { PlaneInfo } from '../types'
+import type { PlaneInfo } from '~/types'
 
 
 export function formatAltitude({alt_baro, baro_rate}:PlaneInfo):string {
@@ -85,5 +85,5 @@ export function formatCoords(local:{lat:string,lon:string},plane:PlaneInfo):stri
   let bearing = (Math.atan2(relLon, relLat) * 180) / Math.PI
   if (bearing < 0) bearing += 360
   const { arrow } = compass.find(({ max }) => bearing < max)!
-  return `${Number(local.lat).toFixed(2)}, ${Number(local.lon).toFixed(2)} ${arrow}`
+  return `${Number(plane.lat).toFixed(3)}, ${Number(plane.lon).toFixed(3)} ${arrow}`
 }

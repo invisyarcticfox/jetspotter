@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
-import { env } from '../config'
-import { loadSeen, logMsg } from '../utils'
+import { env } from '~/config'
+import { loadSeen, logMsg } from '~/utils'
 
 const client = new S3Client({
   region: 'auto',

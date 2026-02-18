@@ -3,4 +3,5 @@
 /node_modules
 /scripts
 .env
+lists.txt
 package-lock.json

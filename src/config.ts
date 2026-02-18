@@ -1,5 +1,6 @@
 import path from 'path'
 import type { PlaneInfo } from './types'
+import { whitelist, blacklist } from './utils'
 
 
 export const seenFile = path.join(process.cwd(), 'data', 'seen.json')
@@ -19,15 +20,13 @@ export const env = {
 }
 
 
-const blacklist = [ 'airbus helicopters', 'grob g-' ]
 export function isBlacklisted({desc}:PlaneInfo):boolean {
   if (!desc) return false
-  return blacklist.some(d => desc.toLowerCase().includes(d))
+  return blacklist.some(b => desc.toLowerCase().includes(b))
 }
 
-const whitelist = [ 'beluga xl', 'antonov an-', 'G-XXEE' ]
 export function isWhitelisted({desc, r}:PlaneInfo):boolean {
   if (!desc && !r) return false
-  const check = [desc, r].filter(Boolean).map(f => f?.toLowerCase())
-  return whitelist.some(w => check.some(f => f?.includes(w)))
+  const fields = [desc, r].filter(Boolean).map(f => f!.toLowerCase())
+  return whitelist.some(w => fields.some(f => f.includes(w)) )
 }

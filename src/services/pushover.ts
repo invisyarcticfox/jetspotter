@@ -1,6 +1,6 @@
-import type { PlaneContext } from '../types'
-import { env } from '../config'
-import { logMsg } from '../utils'
+import type { PlaneContext } from '~/types'
+import { env } from '~/config'
+import { logMsg } from '~/utils'
 
 
 export async function sendPushoverNotif({plane, category, adsbdb, thumb}:PlaneContext) {

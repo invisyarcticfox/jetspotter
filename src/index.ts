@@ -3,7 +3,7 @@ import { coords, radius, secs, isWhitelisted, isBlacklisted } from './config'
 import type { AirplanesDotLive, PlaneContext } from './types'
 import { logKV, updateSeen, recentlySeen, timeout, getSeenInfo } from './utils'
 import { getDB, getThumbnail, sendToDiscord, sendToPushover, sendToCdn } from './services'
-import { startExpress } from './express'
+import { startExpress } from './server'
 
 let activePlanes = new Set<string>()
 

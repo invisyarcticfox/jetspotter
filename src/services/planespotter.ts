@@ -1,5 +1,5 @@
-import type { PlaneSpotters, PlaneSpottersPhoto, PlaneInfo } from '../types'
-import { timeout } from '../utils'
+import type { PlaneSpotters, PlaneSpottersPhoto, PlaneInfo } from '~/types'
+import { timeout } from '~/utils'
 
 
 export async function getPlanespottersImage({hex, r:reg, t:type}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
