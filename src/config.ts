@@ -8,15 +8,13 @@ export const coords = { lat:process.env.COORD_LAT, lon:process.env.COORD_LON }
 export const radius = 15 // nmi
 export const secs = 30 * 1000
 export const env = {
-  pushover: {
-    user: process.env.PUSHOVER_USER_KEY,
-    token: process.env.PUSHOVER_API_KEY
-  },
+  pushover: { user: process.env.PUSHOVER_USER_KEY, token: process.env.PUSHOVER_API_KEY },
   cloudflare: {
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
     accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID,
     secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY
-  }
+  },
+  owm: { coords: process.env.OWM_LATLON, appid: process.env.OWM_API_KEY }
 }
 
 

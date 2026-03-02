@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { coords, radius, secs, isWhitelisted, isBlacklisted } from './config'
 import type { AirplanesDotLive, PlaneContext } from './types'
 import { logKV, updateSeen, recentlySeen, timeout, getSeenInfo } from './utils'
-import { getDB, getThumbnail, sendToDiscord, sendToPushover, sendToCdn } from './services'
+import { getADSBDB, getPlanespotter, sendToDiscord, sendToPushover, sendToCdn } from './services'
 import { startExpress } from './server'
 
 let activePlanes = new Set<string>()
@@ -32,7 +32,7 @@ async function getPlanes() {
         if (!activePlanes.has(plane.hex)) {
           console.log(`${now} ${category} plane spotted.`)
           const seenInfo = await getSeenInfo(plane)
-          const [ adsbdb, thumb ] = await Promise.all([ getDB(plane), getThumbnail(plane) ])
+          const [ adsbdb, thumb ] = await Promise.all([ getADSBDB(plane), getPlanespotter(plane) ])
           const ctx:PlaneContext = { plane, category, adsbdb, thumb, seenInfo }
 
           logKV('Operator', plane.ownOp ?? adsbdb?.operator)

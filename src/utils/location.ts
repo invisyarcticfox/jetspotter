@@ -47,10 +47,13 @@ const gradient:{altitude:number, color: { h:number,s:number,l:number }}[] = [
 ]
 // from https://globe.adsbexchange.com
 
-function hslToHex({h,s,l}:{h:number,s:number,l:number}):string { return `#${convert.hsl.hex(h,s,l)}` }
+function hslToDec({h,s,l}:{h:number,s:number,l:number}):number {
+  const [ r, g, b ] = convert.hsl.rgb(h,s,l)
+  return (r << 16) + (g << 8) + b
+}
 
-export function getAltColour({alt_baro:altitude}:PlaneInfo):string {
-  if (!altitude || altitude === 'ground') return '#808080'
+export function getAltColour({alt_baro:altitude}:PlaneInfo):number {
+  if (!altitude || altitude === 'ground') return 8421504
 
   let lower = gradient[0]
   let upper = gradient[gradient.length - 1]
@@ -63,8 +66,8 @@ export function getAltColour({alt_baro:altitude}:PlaneInfo):string {
     }
   }
   
-  if (altitude <= lower.altitude) { return hslToHex(lower.color) }
-  if (altitude >= upper.altitude) { return hslToHex(upper.color) }
+  if (altitude <= lower.altitude) return hslToDec(lower.color)
+  if (altitude >= upper.altitude) return hslToDec(upper.color)
 
   
   const ratio = (altitude - lower.altitude) / (upper.altitude - lower.altitude)
@@ -74,7 +77,7 @@ export function getAltColour({alt_baro:altitude}:PlaneInfo):string {
     l: lower.color.l + (upper.color.l - lower.color.l) * ratio
   }
 
-  return hslToHex(newHsl)
+  return hslToDec(newHsl)
 }
 
 export function formatCoords(local:{lat:string,lon:string},plane:PlaneInfo):string {

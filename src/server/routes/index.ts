@@ -1,9 +1,9 @@
-import express from 'express'
-import { loadSeen } from '~/utils'
+import { Router } from 'express'
 import fs from 'fs/promises'
+import { loadSeen } from '~/utils'
 import { seenFile } from '~/config'
 
-export const routes = express.Router()
+export const routes = Router()
 
 
 routes.get('/', async (_req,res) => {

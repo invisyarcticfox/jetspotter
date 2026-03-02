@@ -1,6 +1,6 @@
 export type PlaneInfo = {
   hex: string
-  type: string
+  type: 'adsb_icao'|'adsb_icao_nt'|'mlat'|'mode_s'
   flight?: string
   r?: string
   t?: string

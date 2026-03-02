@@ -55,7 +55,7 @@ export function formatSeenCount({seenCount, lastSeen}:PlaneSeenInfo):string|null
   return `${seenCount} ${times} ${last}`
 }
 
-export async function recentlySeen({hex}:PlaneInfo, mins:number=30):Promise<boolean> {
+export async function recentlySeen({hex}:PlaneInfo, mins:number=15):Promise<boolean> {
   if (!hex) return false
 
   try {

@@ -2,7 +2,7 @@ import type { ADSBdb, ADSBdbRes, PlaneInfo } from '~/types'
 import { logMsg, sleep, timeout } from '~/utils'
 
 
-export async function getPlaneDB({hex, flight}:PlaneInfo):Promise<ADSBdbRes|null> {
+export async function getADSBDB({hex, flight}:PlaneInfo):Promise<ADSBdbRes|null> {
   let adsbdb = `https://api.adsbdb.com/v0/aircraft/${hex}`
   let res
   

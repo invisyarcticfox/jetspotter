@@ -3,14 +3,14 @@
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "baseUrl": "./",
+    "baseUrl": "src",
     "rootDir": "src",
     "outDir": "dist",
     "esModuleInterop": true,
     "strict": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "paths": { "~/*": [ "src/*" ] }
+    "paths": { "~/*": [ "*" ] }
   },
   "include": [ "src", "types" ],
   "exclude": [ "node_modules", "data" ]

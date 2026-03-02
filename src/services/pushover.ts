@@ -3,7 +3,7 @@ import { env } from '~/config'
 import { logMsg } from '~/utils'
 
 
-export async function sendPushoverNotif({plane, category, adsbdb, thumb}:PlaneContext) {
+export async function sendToPushover({plane, category, adsbdb, thumb}:PlaneContext) {
   try {
     const formData = new FormData()
     formData.append('token', env.pushover.token)

@@ -1,30 +1,37 @@
-import type { DiscordEmbed, DiscordEmbedField, DiscordButtons, PlaneContext } from '~/types'
+import type { DiscordButtons, PlaneContext, EmbedField, EmbedData } from '~/types'
 import { formatAltitude, getAltColour, formatTrackDir, logMsg, timeout, formatSeenCount, formatCoords } from '~/utils'
 import { coords } from '~/config'
+import { getWeather } from '.'
 import pkg from '../../package.json'
 
 
-export async function sendDiscordMessage({plane, category, adsbdb, thumb, seenInfo}:PlaneContext) {
+export async function sendToDiscord({plane, category, adsbdb, thumb, seenInfo}:PlaneContext) {
   const seen = formatSeenCount(seenInfo)
-  const fields:DiscordEmbedField[] = [
+  const weather = await getWeather()
+
+  const fields:EmbedField[] = [
     { name: 'Operator', value: plane.ownOp ?? adsbdb?.operator ?? 'N/A' },
     { name: 'Callsign', value: `${plane.flight?.trim() || 'N/A'}` },
     { name: 'Registration', value: `${plane.r?.trim() || 'N/A'}` },
     { name: 'Type', value: plane.desc ?? 'N/A' },
-    { name: 'Country', value: adsbdb?.country ?? 'N/A' },
     { name: 'Speed', value: plane.gs ? `${plane.gs}kts` : 'N/A' },
-    { name: 'Lat Lon', value: formatCoords(coords, plane) },
     { name: 'Altitude', value: formatAltitude(plane) },
+    { name: 'Lat Lon', value: formatCoords(coords, plane) },
     { name: 'Bearing', value: formatTrackDir(plane) },
+    { name: 'Source', value: plane.type.toUpperCase() ?? 'N/A' },
     { name: 'Seen Before?', value: seen ? seen : 'No' },
     { name: 'Photographed?', value: seenInfo.photographed ? 'Yes' : 'No' },
+    { name: 'Cloud Coverage', value: weather ? `${weather?.clouds.percent}%` : 'N/A' },
   ].map(f => ({ ...f, inline:true }) )
   
-  const embed:DiscordEmbed = {
+  const embed:EmbedData = {
     color: getAltColour(plane),
     fields,
-    image: thumb ? { url: thumb.thumbnail.large } : null,
-    footer: { text: thumb ? `Version ${pkg.version} - Photo by ${thumb.photographer}` : `Version ${pkg.version}` }
+    image: thumb ? { url: thumb.thumbnail.large } : undefined,
+    footer: {
+      iconURL: 'https://cdn.discordapp.com/emojis/1474124439644934164',
+      text: `Version ${pkg.version}` + thumb ? ` - Photo by ${thumb?.photographer}` : ''
+    }
   }
   const buttons:DiscordButtons[] = [
     { name: 'ADSBExchange.com', link: `https://globe.adsbexchange.com/?icao=${plane.hex}`, row:1 },
