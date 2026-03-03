@@ -8,6 +8,5 @@ declare namespace NodeJS {
     CLOUDFLARE_ACCESS_KEY_ID: string
     CLOUDFLARE_SECRET_ACCESS_KEY: string
     OWM_API_KEY: string
-    OWM_LATLON: string
   }
 }

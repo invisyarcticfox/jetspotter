@@ -14,7 +14,7 @@ export const env = {
     accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY_ID,
     secretAccessKey: process.env.CLOUDFLARE_SECRET_ACCESS_KEY
   },
-  owm: { coords: process.env.OWM_LATLON, appid: process.env.OWM_API_KEY }
+  owm: { coords, appid: process.env.OWM_API_KEY }
 }
 
 

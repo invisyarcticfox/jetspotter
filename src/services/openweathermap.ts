@@ -1,14 +1,13 @@
 import { OpenWeatherMap, WeatherContext } from '~/types'
-import { env } from '~/config'
+import { coords, env } from '~/config'
 import { timeout } from '~/utils'
 
 
 export async function getWeather():Promise<WeatherContext|null> {
-  const [ lat, lon ] = env.owm.coords.split(';')
   try {
     const url = new URL('https://api.openweathermap.org/data/2.5/weather?units=metric')
-    url.searchParams.set('lat', lat)
-    url.searchParams.set('lon', lon)
+    url.searchParams.set('lat', coords.lat)
+    url.searchParams.set('lon', coords.lon)
     url.searchParams.set('appid', env.owm.appid)
     const res = await fetch(url, { signal:timeout() })
     const d:OpenWeatherMap = await res.json()

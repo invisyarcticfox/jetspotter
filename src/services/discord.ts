@@ -30,7 +30,7 @@ export async function sendToDiscord({plane, category, adsbdb, thumb, seenInfo}:P
     image: thumb ? { url: thumb.thumbnail.large } : undefined,
     footer: {
       iconURL: 'https://cdn.discordapp.com/emojis/1474124439644934164',
-      text: `Version ${pkg.version}` + thumb ? ` - Photo by ${thumb?.photographer}` : ''
+      text: thumb ? `Version ${pkg.version} - Photo by ${thumb.photographer}` : `Version ${pkg.version}`,
     }
   }
   const buttons:DiscordButtons[] = [
