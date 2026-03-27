@@ -10,6 +10,3 @@ export function startExpress() {
   app.use('/', routes)
   app.listen(9004, () => { console.log('Express server running on http://raspi:9004/') })
 }
-
-
-if (require.main === module) startExpress() // for express:dev

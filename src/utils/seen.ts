@@ -1,47 +1,6 @@
-import fs from 'fs/promises'
-import path from 'path'
-import type { SeenData, PlaneContext, PlaneInfo, PlaneSeenInfo } from '~/types'
-import { seenFile } from '~/config'
+import type { PlaneInfo, PlaneSeenInfo, JetspotterData } from '~/types'
+import { localDb } from '~/services'
 
-
-export async function loadSeen():Promise<SeenData> {
-  try {
-    await fs.mkdir(path.dirname(seenFile), { recursive: true })
-    const raw = await fs.readFile(seenFile, 'utf-8').catch(() => '{}')
-    return JSON.parse(raw)
-  } catch (error) {
-    console.error('Error reading seen.json:', error)
-    return {}
-  }
-}
-
-export async function updateSeen({plane, adsbdb, category, thumb}:PlaneContext) {
-  const data = await loadSeen()
-  const entry = plane.hex
-  const now = new Date().toISOString()
-
-  if (!data[entry]) {
-    data[entry] = {
-      reg: plane.r?.trim() || 'N/A',
-      callsign: plane.flight?.trim() || 'N/A',
-      type: plane.desc ?? 'N/A',
-      operator: plane.ownOp ?? adsbdb?.operator ?? 'N/A',
-      country: adsbdb?.country ?? 'N/A',
-      ...(category === 'Whitelisted' && { category:'whitelisted' } ),
-      seenCount: 1,
-      lastSeen: now,
-      ...( thumb?.photographer && { photographer: thumb.photographer } )
-    }
-  } else {
-    data[entry].seenCount += 1
-    data[entry].lastSeen = now
-    if (plane.flight?.trim()) data[entry].callsign = plane.flight.trim()
-    if (thumb) data[entry].photographer = thumb.photographer
-  }
-
-  try { await fs.writeFile(seenFile, JSON.stringify(data, null, 2), 'utf-8')
-  } catch (error) { console.error('Error writing to seen.json:', error) }
-}
 
 export function formatSeenCount({seenCount, lastSeen}:PlaneSeenInfo):string|null {
   if (!seenCount) return null
@@ -55,17 +14,16 @@ export function formatSeenCount({seenCount, lastSeen}:PlaneSeenInfo):string|null
   return `${seenCount} ${times} ${last}`
 }
 
-export async function recentlySeen({hex}:PlaneInfo, mins:number=15):Promise<boolean> {
+export async function recentlySeen({hex}:PlaneInfo, mins:number=10):Promise<boolean> {
   if (!hex) return false
 
   try {
-    const data = await loadSeen()
-    const entry = data[hex]
-    if (!entry || !entry?.lastSeen) return false
+    const row = localDb.prepare(`SELECT lastSeen FROM jetspotter WHERE hex = ?`).get(hex) as JetspotterData
+    if (!row.lastSeen) return false
 
-    const lastSeenTime = new Date(entry.lastSeen).getTime()
+    const lastSeenTime = new Date(row.lastSeen).getTime()
     const now = Date.now()
-    const diffMins = ( now - lastSeenTime ) / 60000
+    const diffMins = ( now - lastSeenTime ) / 60_000
 
     return diffMins < mins
   } catch (error) {
@@ -75,15 +33,16 @@ export async function recentlySeen({hex}:PlaneInfo, mins:number=15):Promise<bool
 }
 
 export async function getSeenInfo({hex}:PlaneInfo):Promise<PlaneSeenInfo> {
-  try {
-    const data = await loadSeen()
-    const entry = data[hex]
+  if (!hex) return { seenCount: null, lastSeen: null, photographed: false }
 
-    if (!entry) return { seenCount:null, lastSeen:null, photographed:false }
+  try {
+    const row = localDb.prepare(`SELECT seenCount, lastSeen, photographed FROM jetspotter WHERE hex = ?`).get(hex) as JetspotterData
+    if (!row) return { seenCount: null, lastSeen: null, photographed: false }
+
     return {
-      seenCount: entry.seenCount ?? null,
-      lastSeen: entry.lastSeen ?? null,
-      photographed: Boolean(entry.photographed)
+      seenCount: row.seenCount ?? null,
+      lastSeen: row.lastSeen ?? null,
+      photographed: row.photographed === 1
     }
   } catch (error) {
     console.error('Error reading plane seen info:', error)

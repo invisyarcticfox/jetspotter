@@ -34,9 +34,10 @@ export async function sendToDiscord({plane, category, adsbdb, thumb, seenInfo}:P
     }
   }
   const buttons:DiscordButtons[] = [
-    { name: 'ADSBExchange.com', link: `https://globe.adsbexchange.com/?icao=${plane.hex}`, row:1 },
-    { name: 'FlightRadar24.com', link: plane.flight?.trim() ? `https://flightradar24.com/${plane.flight.trim()}` : null, row:1 },
-    { name: 'Planespotters.net', link: thumb ? thumb.link : null, row:2 },
+    { name: 'ADSBExchange.com',   link: `https://globe.adsbexchange.com/?icao=${plane.hex}`,                              row:1 },
+    { name: 'FlightRadar24.com',  link: plane.flight?.trim() ? `https://flightradar24.com/${plane.flight.trim()}` : null, row:1 },
+    { name: 'PlaneSpotters.net',  link: thumb && plane.r ? `https://planespotters.net/photos/reg/${plane.r}` : null,      row:2 },
+    { name: 'JetPhotos.com',      link: plane.r ? `https://www.jetphotos.com/registration/${plane.r}` : null,             row:2 },
   ]
 
 

@@ -24,5 +24,8 @@ export async function getWeather():Promise<WeatherContext|null> {
       wind: { speed: d.wind.speed, deg: d.wind.deg },
       clouds: { percent: d.clouds.all }
     }
-  } catch (error) { console.error(error); return null }
+  } catch (error) {
+    console.error('Failed to fetch weather data:', error)
+    return null
+  }
 }

@@ -1,9 +1,9 @@
 import 'dotenv/config'
 import { coords, radius, secs, isWhitelisted, isBlacklisted } from './config'
 import type { AirplanesDotLive, PlaneContext } from './types'
-import { logKV, updateSeen, recentlySeen, timeout, getSeenInfo } from './utils'
-import { getADSBDB, getPlanespotter, sendToDiscord, sendToPushover, sendToCdn } from './services'
-import { startExpress } from './server'
+import { logKV, recentlySeen, timeout, getSeenInfo } from './utils'
+import { getADSBDB, getPlanespotter, sendToDiscord, sendToPushover, sendToD1, authD1, updateLocalDb } from './services'
+import { startExpress } from './api'
 
 let activePlanes = new Set<string>()
 
@@ -38,17 +38,17 @@ async function getPlanes() {
           logKV('Operator', plane.ownOp ?? adsbdb?.operator)
           logKV('Callsign', plane.flight)
           logKV('Registration', plane.r)
-          logKV('Altitude', plane.alt_baro, 'ft')
+          // logKV('Altitude', plane.alt_baro, 'ft')
           // logKV('Lat Lon', `${plane.lat} ${plane.lon}`)
           // logKV('Speed', plane.gs, 'kts')
           // logKV('Direction', plane.track, '°')
           logKV('Type', plane.desc)
-          logKV('Country', adsbdb?.country)
-          logKV('Seen before', `${seenInfo.seenCount} times`)
+          // logKV('Country', adsbdb?.country)
+          // logKV('Seen before', `${seenInfo.seenCount} times`)
 
           await Promise.allSettled([ sendToDiscord(ctx), sendToPushover(ctx) ])
-          await updateSeen(ctx)
-          await sendToCdn()
+          await sendToD1(ctx)
+          updateLocalDb(ctx)
           console.log('===============')
         }
       }
@@ -58,7 +58,13 @@ async function getPlanes() {
 }
 
 
-console.log('Script started. Watching for matching aircraft.')
-setInterval(getPlanes, secs)
-getPlanes()
-startExpress()
+
+(async () => {
+  console.log('Script started. Watching for matching aircraft.')
+
+  startExpress()
+  await authD1()
+  
+  getPlanes()
+  setInterval(getPlanes, secs)
+})().catch(error => console.error(error))
