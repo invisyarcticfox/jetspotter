@@ -2,6 +2,6 @@
 /dist
 /node_modules
 /scripts
+src/lists.json
 .env
-lists.txt
 package-lock.json

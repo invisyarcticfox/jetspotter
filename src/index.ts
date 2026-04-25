@@ -23,8 +23,9 @@ async function getPlanes() {
     
 
     for (const plane of flights) {
-      if ((plane.dbFlags === 1 || isWhitelisted(plane)) && !isBlacklisted(plane)) {
-        const category = plane.dbFlags === 1 ? 'Military' : 'Whitelisted'
+      const isMilitary = ((plane.dbFlags ?? 0) & 1) !== 0
+      if (isWhitelisted(plane) || (isMilitary && !isBlacklisted(plane))) {
+        const category = isMilitary ? 'Military' : 'Whitelisted'
 
         currentPlanes.add(plane.hex)
         if (await recentlySeen(plane)) continue
@@ -44,7 +45,7 @@ async function getPlanes() {
           // logKV('Direction', plane.track, '°')
           logKV('Type', plane.desc)
           // logKV('Country', adsbdb?.country)
-          // logKV('Seen before', `${seenInfo.seenCount} times`)
+          logKV('Seen before', `${seenInfo.seenCount} times`)
 
           await Promise.allSettled([ sendToDiscord(ctx), sendToPushover(ctx) ])
           await sendToD1(ctx)

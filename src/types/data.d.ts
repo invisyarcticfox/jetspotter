@@ -1,5 +1,4 @@
 import { PlaneInfo, ADSBdbRes, PlaneSpottersPhoto } from './http'
-import { PlaneSeenInfo } from '.'
 
 
 export type PlaneContext = {
@@ -8,21 +7,6 @@ export type PlaneContext = {
   adsbdb?: ADSBdbRes|null
   thumb?: PlaneSpottersPhoto|null
   seenInfo: PlaneSeenInfo
-}
-
-export type SeenData = {
-  [hex:string]: {
-    reg: string
-    callsign: string
-    type: string
-    operator: string
-    country: string
-    category?: string
-    seenCount: number
-    lastSeen: string
-    photographed?: boolean
-    photographer?: string
-  }
 }
 
 export type PlaneSeenInfo = {
@@ -39,8 +23,13 @@ export type JetspotterData = {
   operator: string
   country: string
   category: string|null
-  seenCount: number
-  lastSeen: string
+  seenCount: number|null
+  lastSeen: string|null
   photographed: number|null
   photographer: string|null
+}
+
+export type Lists = {
+  whitelist: { desc: string[]; reg: string[] }
+  blacklist: { desc: string[]; reg: string[] }
 }

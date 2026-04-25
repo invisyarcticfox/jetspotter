@@ -18,13 +18,14 @@ export const env = {
 }
 
 
-export function isBlacklisted({desc}:PlaneInfo):boolean {
-  if (!desc) return false
-  return blacklist.some(b => desc.toLowerCase().includes(b))
+export function isBlacklisted({ desc, r }:PlaneInfo):boolean {
+  const d = desc?.toLowerCase() || ''
+  const reg = r?.toLowerCase() || ''
+  return ( blacklist.desc.some(b => d.includes(b)) || blacklist.reg.some(b => reg.includes(b)) )
 }
 
-export function isWhitelisted({desc, r}:PlaneInfo):boolean {
-  if (!desc && !r) return false
-  const fields = [desc, r].filter(Boolean).map(f => f!.toLowerCase())
-  return whitelist.some(w => fields.some(f => f.includes(w)) )
+export function isWhitelisted({ desc, r }:PlaneInfo):boolean {
+  const d = desc?.toLowerCase() || ''
+  const reg = r?.toLowerCase() || ''
+  return ( whitelist.desc.some(w => d.includes(w)) || whitelist.reg.some(w => reg.includes(w)) )
 }

@@ -18,8 +18,8 @@ export async function recentlySeen({hex}:PlaneInfo, mins:number=10):Promise<bool
   if (!hex) return false
 
   try {
-    const row = localDb.prepare(`SELECT lastSeen FROM jetspotter WHERE hex = ?`).get(hex) as JetspotterData
-    if (!row.lastSeen) return false
+    const row = localDb.prepare(`SELECT lastSeen FROM jetspotter WHERE hex = ?`).get(hex) as Pick<JetspotterData, 'lastSeen'> | undefined
+    if (!row?.lastSeen) return false
 
     const lastSeenTime = new Date(row.lastSeen).getTime()
     const now = Date.now()
@@ -36,7 +36,7 @@ export async function getSeenInfo({hex}:PlaneInfo):Promise<PlaneSeenInfo> {
   if (!hex) return { seenCount: null, lastSeen: null, photographed: false }
 
   try {
-    const row = localDb.prepare(`SELECT seenCount, lastSeen, photographed FROM jetspotter WHERE hex = ?`).get(hex) as JetspotterData
+    const row = localDb.prepare(`SELECT seenCount, lastSeen, photographed FROM jetspotter WHERE hex = ?`).get(hex) as JetspotterData|undefined
     if (!row) return { seenCount: null, lastSeen: null, photographed: false }
 
     return {
