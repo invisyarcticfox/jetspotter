@@ -1,5 +1,6 @@
 import type { PlaneSpotters, PlaneSpottersPhoto, PlaneInfo } from '~/types'
 import { timeout } from '~/utils'
+import pkg from '../../package.json'
 
 
 export async function getPlanespotter({hex, r:reg, t:type}:PlaneInfo):Promise<PlaneSpottersPhoto|null> {
@@ -8,7 +9,10 @@ export async function getPlanespotter({hex, r:reg, t:type}:PlaneInfo):Promise<Pl
     if (reg) url.searchParams.set('reg', reg)
     if (type) url.searchParams.set('icaoType', type)
     
-    const res = await fetch(url, { signal:timeout() })
+    const res = await fetch(url, {
+      signal:timeout(),
+      headers: { 'User-Agent': `invisyarcticfox@JetSpotter/v${pkg.version} (lucas@itaf.uk https://itaf.uk)` }
+    })
     if (!res.ok) {
       console.error(`Failed to fetch planespotters.net`, res.status, res.statusText)
       return null

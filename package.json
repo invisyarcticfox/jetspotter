@@ -1,7 +1,7 @@
 {
   "name": "jetspotter",
   "author": "invisyarcticfox",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "type": "commonjs",
   "scripts": {
     "build": "rm -rf ./dist && tsc && tsc-alias",
