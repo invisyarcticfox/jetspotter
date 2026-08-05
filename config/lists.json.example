@@ -1,0 +1,15 @@
+{
+  "whitelist": {
+    "registration": [
+      "2-GOOD",
+      "2-FAST",
+      "G-LMAO",
+      "G-EELS"
+    ],
+    "type": [ "A124" ]
+  },
+  "blacklist": {
+    "registration": [ ],
+    "type": [ "EC35", "G12T" ]
+  }
+}

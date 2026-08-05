@@ -1,23 +1,47 @@
-export const env = {
-  coords: { lat: process.env.COORD_LAT!, lon: process.env.COORD_LON! },
-  api: {
-    pushover: {
-      user: process.env.PO_USR_KEY!,
-      token: process.env.PO_TOKEN!
-    },
-    cloudflare: {
-      accId: process.env.CF_ACC_ID!,
-      d1: {
-        id: process.env.CF_D1_ID!,
-        token: process.env.CF_D1_TOKEN!
-      }
-    },
-    owm: { token: process.env.OWM_TOKEN! }
-  }
+import fs from 'node:fs'
+import path from 'node:path'
+import { defaultConf, type Config } from './defaults'
+import type { WhiteBlackList, LoadedLists } from './types'
+
+const configFile = path.join(process.cwd(), 'config', 'config.json')
+const listsFile = path.join(process.cwd(), 'config', 'lists.json')
+
+
+const userConf:Partial<Config> = fs.existsSync(configFile) ? JSON.parse(fs.readFileSync(configFile, 'utf8')) : {} 
+export const config:Config = { ...defaultConf, ...userConf }
+
+
+let lists:LoadedLists = {
+  whitelist: { registration:new Set(), type:new Set() },
+  blacklist: { registration:new Set(), type:new Set() }
 }
 
-export const conf = {
-  radius: 15, // nmi
-  interval: 30, //seconds
-  tz: 'Europe/London' // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/DateTimeFormat#timezone
+function loadLists() {
+  if (!fs.existsSync(listsFile)) {
+    return lists = {
+      whitelist: { registration: new Set(), type: new Set() },
+      blacklist: { registration: new Set(), type: new Set() }
+    }
+  }
+
+  try {
+    const user:Partial<WhiteBlackList> = JSON.parse(fs.readFileSync(listsFile, 'utf8'))
+
+    lists = {
+      whitelist: {
+        registration: new Set(user.whitelist?.registration?.map(r => r.trim().toUpperCase()) ?? []),
+        type: new Set(user.whitelist?.type?.map(t => t.trim().toUpperCase()) ?? [])
+      },
+      blacklist: {
+        registration: new Set(user.blacklist?.registration?.map(r => r.trim().toUpperCase()) ?? []),
+        type: new Set(user.blacklist?.type?.map(t => t.trim().toUpperCase()) ?? [])
+      }
+    }
+
+    console.log('Lists reloaded')
+  } catch (error) { console.error('Failed to load lists.json:', error) }
 }
+loadLists()
+
+fs.watch(listsFile, (event) => { if (event === 'change') loadLists() })
+export function getLists() { return lists }

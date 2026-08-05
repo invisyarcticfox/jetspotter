@@ -1,3 +1,5 @@
+/config/config.json
+/config/lists.json
 /data
 /dist
 /node_modules

@@ -1,35 +1,24 @@
-export type AirplanesDotLive = {
-  ac: {
+export type AdsbLol = {
+  now: number
+  aircraft: {
     hex: string
     type: string
     flight?: string
     r?: string
     t?: string
-    desc?: string
     alt_baro: any
     alt_geom?: number
     gs?: number
-    ias?: number
     tas?: number
-    mach?: number
-    wd?: number
-    ws?: number
-    oat?: number
-    tat?: number
     track?: number
     track_rate?: number
     roll?: number
-    mag_heading?: number
-    true_heading?: number
-    baro_rate?: number
     geom_rate?: number
     squawk?: string
     emergency?: string
     category?: string
     nav_qnh?: number
     nav_altitude_mcp?: number
-    nav_heading?: number
-    nav_modes?: string[]
     lat: number
     lon: number
     nic: number
@@ -46,28 +35,27 @@ export type AirplanesDotLive = {
     alert?: number
     spi?: number
     mlat: string[]
-    tisb: any[]
+    tisb: string[]
     messages: number
     seen: number
     rssi: number
     dst: number
     dir: number
-    ownOp?: string
-    year?: string
+    ias?: number
+    mach?: number
+    wd?: number
+    ws?: number
+    oat?: number
+    tat?: number
+    mag_heading?: number
+    true_heading?: number
+    baro_rate?: number
+    nav_heading?: number
     nav_altitude_fms?: number
+    nav_modes?: string[]
     dbFlags?: number
     calc_track?: number
   }[]
-  msg: string
-  now: number
-  total: number
-  ctime: number
+  resultCount: number
   ptime: number
-}
-
-export const enum DbFlags {
-  Military = 1,
-  Interesting = 2,
-  PIA = 4,
-  LADD = 8
 }
