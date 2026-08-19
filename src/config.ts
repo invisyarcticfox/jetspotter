@@ -1,47 +1,20 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { defaultConf, type Config } from './defaults'
-import type { WhiteBlackList, LoadedLists } from './types'
+import fs from 'fs'
+import path from 'path'
+export { getLists } from './whiteblacklist'
 
-const configFile = path.join(process.cwd(), 'config', 'config.json')
-const listsFile = path.join(process.cwd(), 'config', 'lists.json')
+const confFile = path.join(process.cwd(), 'config', 'config.json')
+type Config = {
+  coords: { lat: number, lon: number }
+  radius: number
+  userAgent: string
 
-
-const userConf:Partial<Config> = fs.existsSync(configFile) ? JSON.parse(fs.readFileSync(configFile, 'utf8')) : {} 
-export const config:Config = { ...defaultConf, ...userConf }
-
-
-let lists:LoadedLists = {
-  whitelist: { registration:new Set(), type:new Set() },
-  blacklist: { registration:new Set(), type:new Set() }
-}
-
-function loadLists() {
-  if (!fs.existsSync(listsFile)) {
-    return lists = {
-      whitelist: { registration: new Set(), type: new Set() },
-      blacklist: { registration: new Set(), type: new Set() }
-    }
+  discord: {
+    bot: { token: string }
+    channelId: string
   }
-
-  try {
-    const user:Partial<WhiteBlackList> = JSON.parse(fs.readFileSync(listsFile, 'utf8'))
-
-    lists = {
-      whitelist: {
-        registration: new Set(user.whitelist?.registration?.map(r => r.trim().toUpperCase()) ?? []),
-        type: new Set(user.whitelist?.type?.map(t => t.trim().toUpperCase()) ?? [])
-      },
-      blacklist: {
-        registration: new Set(user.blacklist?.registration?.map(r => r.trim().toUpperCase()) ?? []),
-        type: new Set(user.blacklist?.type?.map(t => t.trim().toUpperCase()) ?? [])
-      }
-    }
-
-    console.log('Lists reloaded')
-  } catch (error) { console.error('Failed to load lists.json:', error) }
+  owm: { apiKey: string }
+  pushover: { user: string, token: string }
 }
-loadLists()
 
-fs.watch(listsFile, (event) => { if (event === 'change') loadLists() })
-export function getLists() { return lists }
+const usrConf:Config = JSON.parse(fs.readFileSync(confFile, 'utf8'))
+export const config:Config = usrConf

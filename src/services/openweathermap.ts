@@ -6,11 +6,14 @@ import { timeout } from '~/utils'
 export async function getOwm():Promise<Weather|null> {
   try {
     const url = new URL('https://api.openweathermap.org/data/2.5/weather?units=metric')
-    url.searchParams.set('lat', config.coords.lat)
-    url.searchParams.set('lon', config.coords.lon)
+    url.searchParams.set('lat', config.coords.lat.toFixed(2))
+    url.searchParams.set('lon', config.coords.lon.toFixed(2))
     url.searchParams.set('appid', config.owm.apiKey)
 
-    const res = await fetch(url, { signal: timeout() })
+    const res = await fetch(url, {
+      signal: timeout(),
+      headers: { 'User-Agent': config.userAgent }
+    })
     if (!res.ok) {
       console.error(`Failed to fetch ${res.url}:`, res.status, res.statusText)
       return null

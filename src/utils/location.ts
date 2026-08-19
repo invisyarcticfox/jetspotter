@@ -1,29 +1,76 @@
 import type { HexColorString } from 'discord.js'
 import { config } from '~/config'
 import type { CTX } from '~/types'
-type HSL = { h:number, s:number, l:number }
 
 
-const altGradient:{altitude:number, color:HSL}[] = [
-  { altitude: 0,     color: { h:23.125, s:88, l:51.04 } },
-  { altitude: 500,   color: { h:23.125, s:88, l:51.04 } },
-  { altitude: 1000,  color: { h:26.25,  s:88, l:52.08 } },
-  { altitude: 2000,  color: { h:32.5,   s:88, l:53.87 } },
-  { altitude: 4000,  color: { h:43,     s:88, l:51.5  } },
-  { altitude: 6000,  color: { h:54,     s:88, l:44.8  } },
-  { altitude: 8000,  color: { h:72,     s:88, l:41.8  } },
-  { altitude: 10000, color: { h:112.5,  s:88, l:41    } },
-  { altitude: 20000, color: { h:189.65, s:88, l:43.86 } },
-  { altitude: 30000, color: { h:244.83, s:88, l:57.03 } },
-  { altitude: 40000, color: { h:300,    s:88, l:43    } },
-  { altitude: 50000, color: { h:360,    s:88, l:58.04 } },
+const altHue:{ altitude:number, hue:number }[] = [
+  { altitude: 0,      hue: 20    },
+  { altitude: 2000,   hue: 32.5  },
+  { altitude: 4000,   hue: 43    },
+  { altitude: 6000,   hue: 54    },
+  { altitude: 8000,   hue: 72    },
+  { altitude: 9000,   hue: 85    },
+  { altitude: 11000,  hue: 140   },
+  { altitude: 40000,  hue: 300   },
+  { altitude: 51000,  hue: 360   },
 ]
-// from https://globe.adsbexchange.com
+const hueLight:{ hue:number, lightness:number }[] = [
+  { hue: 0,   lightness: 53 },
+  { hue: 20,  lightness: 50 },
+  { hue: 32,  lightness: 54 },
+  { hue: 40,  lightness: 52 },
+  { hue: 46,  lightness: 51 },
+  { hue: 50,  lightness: 46 },
+  { hue: 60,  lightness: 43 },
+  { hue: 80,  lightness: 41 },
+  { hue: 100, lightness: 41 },
+  { hue: 120, lightness: 41 },
+  { hue: 140, lightness: 41 },
+  { hue: 160, lightness: 40 },
+  { hue: 180, lightness: 40 },
+  { hue: 190, lightness: 44 },
+  { hue: 198, lightness: 50 },
+  { hue: 200, lightness: 58 },
+  { hue: 220, lightness: 58 },
+  { hue: 240, lightness: 58 },
+  { hue: 255, lightness: 55 },
+  { hue: 266, lightness: 55 },
+  { hue: 270, lightness: 58 },
+  { hue: 280, lightness: 58 },
+  { hue: 290, lightness: 47 },
+  { hue: 300, lightness: 43 },
+  { hue: 310, lightness: 48 },
+  { hue: 320, lightness: 48 },
+  { hue: 340, lightness: 52 },
+  { hue: 360, lightness: 53 },
+]
+// taken from https://github.com/wiedehopf/tar1090/blob/b018536/html/planeObject.js#L761
+// and https://github.com/wiedehopf/tar1090/blob/b018536/html/defaults.js#L120
+
+function interp(value:number, points: { value:number, output:number }[]):number {
+  if (value <= points[0].value) return points[0].output
+
+  for (let i = 1; i < points.length; i++) {
+    const upper = points[i]
+    const lower = points[i - 1]
+
+    if (value <= upper.value) {
+      const ratio = (value - lower.value) / (upper.value - lower.value)
+      return lower.output + (upper.output - lower.output) * ratio
+    }
+  }
+
+  return points[points.length - 1].output
+}
+
+const altToHue = (alt:number):number => { return interp(alt, altHue.map(point => ({ value: point.altitude, output: point.hue }))) }
+const hueToLight = (hue:number):number => { return interp(hue, hueLight.map(point => ({ value: point.hue, output: point.lightness }))) }
+
 
 const compass = [ '↑', '↗', '→', '↘', '↓', '↙', '←', '↖', ] as const
 const getCompassArrow = (deg:number):string => compass[Math.round(deg / 45) % 8]
 
-function hslToHex({h,s,l}:HSL):HexColorString {
+function hslToHex({h,s,l}:{ h:number, s:number, l:number }):HexColorString {
   s /= 100
   l /= 100
 
@@ -38,36 +85,20 @@ function hslToHex({h,s,l}:HSL):HexColorString {
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
 
-
 export function getAltColour(alt:CTX['plane']['alt']):HexColorString {
-  if (!alt || alt === 'ground') return '#737373'
+  if (alt === 'ground') return hslToHex({ h:200, s:0, l:30 })
+  if (alt == null) return hslToHex({ h:0, s:0, l:75 })
 
-  let upper = altGradient[altGradient.length - 1]
-  let lower = altGradient[0]
+  const altitude = Number(alt)
+  if (!Number.isFinite(altitude)) return hslToHex({ h:0, s:0, l:75 })
 
-  for (let i = 0; i < altGradient.length; i++) {
-    if (altGradient[i].altitude >= alt) {
-      upper = altGradient[i]
-      lower = i > 0 ? altGradient[i - 1] : altGradient[0]
-      break
-    }
-  }
-  
-  if (alt >= upper.altitude) return hslToHex(upper.color)
-  if (alt <= lower.altitude) return hslToHex(lower.color)
+  const hue = altToHue(altitude)
+  const light = hueToLight(hue)
 
-  const ratio = (alt - lower.altitude) / (upper.altitude - lower.altitude)
-
-  const hsl = {
-    h: lower.color.h + (upper.color.h - lower.color.h) * ratio,
-    s: lower.color.s + (upper.color.s - lower.color.s) * ratio,
-    l: lower.color.l + (upper.color.l - lower.color.l) * ratio
-  }
-
-  return hslToHex(hsl)
+  return hslToHex({ h:hue, s:88, l:light })
 }
 
-function formatAltitude({alt, baro_rate, geo_rate}:CTX['plane']):string {
+export function formatAltitude({alt, baro_rate, geo_rate}:CTX['plane']):string {
   if (alt === 'ground') return 'Ground'
   const rate = geo_rate ?? baro_rate
   const str = `${alt.toLocaleString()}ft`
@@ -79,12 +110,12 @@ function formatAltitude({alt, baro_rate, geo_rate}:CTX['plane']):string {
   return str
 }
 
-function formatHeadingDir(head:CTX['plane']['heading']):string {
+export function formatHeadingDir(head:CTX['plane']['heading']):string {
   if (!head) return 'N/A'
   return `${head.toFixed(0)}° ${getCompassArrow(head)}`
 }
 
-function formatCoords(plane:CTX['plane']):string {
+export function formatCoords(plane:CTX['plane']):string {
   if (!plane.lat && !plane.lon) return 'N/A'
 
   const relLat = plane.lat - Number(config.coords.lat)
@@ -93,10 +124,4 @@ function formatCoords(plane:CTX['plane']):string {
   if (bearing < 0) bearing += 360
 
   return `${plane.lat.toFixed(3)}, ${plane.lon.toFixed(3)} ${getCompassArrow(bearing)}`
-}
-
-export const format = {
-  altitude: formatAltitude,
-  heading: formatHeadingDir,
-  coords: formatCoords
 }

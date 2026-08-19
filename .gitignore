@@ -1,5 +1,5 @@
-/config/config.json
-/config/lists.json
+/config/*
+!/config/*.example
 /data
 /dist
 /node_modules

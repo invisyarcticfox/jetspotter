@@ -1,21 +1,12 @@
 {
   "coords": { "lat": "51.47787", "lon": "-0.00147" },
-
   "radius": 15,
-  "interval": 30,
+  "userAgent": "",
 
   "discord": {
-    "method": "webhook",
-
-    "webhookUrl": "",
-
-    "bot": {
-      "endpoint": "",
-      "channelId": ""
-    }
+    "bot": { "token": "" },
+    "channelId": ""
   },
-
   "owm": { "apiKey": "" },
-
   "pushover": { "user": "", "token": "" }
 }

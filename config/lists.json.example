@@ -1,5 +1,6 @@
 {
   "whitelist": {
+    "hex": [ "000001" ],
     "registration": [
       "2-GOOD",
       "2-FAST",
@@ -9,7 +10,8 @@
     "type": [ "A124" ]
   },
   "blacklist": {
-    "registration": [ ],
+    "hex": [],
+    "registration": [],
     "type": [ "EC35", "G12T" ]
   }
 }

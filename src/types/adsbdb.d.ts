@@ -10,6 +10,8 @@ export type AdsbDb = {
       registered_owner_country_name: string
       registered_owner_operator_flag_code: string
       registered_owner: string
+      url_photo: string|null
+      url_photo_thumbnail: string|null
     }
   }
 }

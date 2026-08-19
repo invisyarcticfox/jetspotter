@@ -2,7 +2,7 @@ export type CTX = {
   plane: {
     hex: string
     reg?: string
-    callsign?: string|null
+    callsign?: string
     type?: string
     operator?: string
     alt: number|'ground'
@@ -16,15 +16,8 @@ export type CTX = {
     country?: string
   },
   category: 'Military'|'Whitelisted',
-  thumb?: {
-    photo: string
-    photographer: string
-  }|null
-  db?: {
-    seenCount: number,
-    lastSeen: string,
-    photographed: boolean
-  }|null
+  thumb?: { photo: string, photographer: string }|null
+  db?: { seenCount: number, lastSeen: string, photographed: boolean }|null
 }
 
 export type DB = {
@@ -38,16 +31,6 @@ export type DB = {
   photographed: number
   photographer: string|null
 }
-
-export type WhiteBlackList = {
-  whitelist: { registration:string[], type:string[] },
-  blacklist: { registration:string[], type:string[] }
-}
-export type LoadedLists = {
-  whitelist: { registration:Set<string>, type:Set<string> }
-  blacklist: { registration:Set<string>, type:Set<string> }
-}
-
 
 export enum DbFlags {
   Military = 1,

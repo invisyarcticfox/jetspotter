@@ -4,7 +4,7 @@ import Database from 'better-sqlite3'
 
 const dbDir = path.resolve(process.cwd(), 'data')
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir)
-const dbPth = path.join(dbDir, 'jetspotter.db')
+const dbPth = path.join(dbDir, 'seen.db')
 
 export const db = new Database(dbPth)
 
