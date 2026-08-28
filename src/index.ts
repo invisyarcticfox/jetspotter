@@ -45,13 +45,14 @@ async function getPlanes() {
 
   try {
     const res = await fetch(
-      `https://re-api.adsb.lol/?circle=${config.coords.lat},${config.coords.lon},${config.radius}`,
+      // `https://re-api.adsb.lol/?circle=${config.coords.lat},${config.coords.lon},${config.radius}`,
+      `https://api.adsb.lol/v2/point/${config.coords.lat}/${config.coords.lon}/${config.radius}`,
       {
         signal: timeout(10),
         headers: { 'User-Agent': config.userAgent }
       })
     if (!res.ok) return console.log(`Failed to fetch ${res.url}:`, res.status, res.statusText)
-    const { aircraft }:AdsbLol.ReApi = await res.json()
+    const { ac:aircraft }:AdsbLol.v2 = await res.json()
     if (!aircraft.length) return inRangePlanes.clear()
 
     const currentPlanes = new Set<string>()
@@ -75,7 +76,7 @@ async function getPlanes() {
           reg: db?.reg ?? plane.r ?? apl?.r ?? adsbdb?.registration,
           callsign: plane.flight?.trim() || apl?.flight?.trim() || undefined,
           type: db?.type ?? apl?.desc ?? `${adsbdb?.manufacturer} ${adsbdb?.type}`,
-          operator: apl?.ownOp ?? adsbdb?.registered_owner ?? db?.operator ?? undefined,
+          operator:  db?.operator ?? apl?.ownOp ?? adsbdb?.registered_owner ?? undefined,
           alt: plane.alt_baro,
           baro_rate: plane.baro_rate,
           geo_rate: plane.geom_rate,
